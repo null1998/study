@@ -2,6 +2,7 @@ package org.example.collection;
 
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -14,14 +15,30 @@ public class HashMapTest {
      * 默认初始化容量为16，kv数量大于容量的0.75倍时，容量以乘以2的方式扩容
      */
     @Test
-    public void testExpansion() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void testExpansion() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         Map<Integer, Integer> map = new HashMap<>();
-        for (int i = 1; i <= 10000; i++) {
+        Class<?> mapType = map.getClass();
+        Method capacity = mapType.getDeclaredMethod("capacity");
+        capacity.setAccessible(true);
+        // 默认容量为16
+        assert (int) capacity.invoke(map) == 16;
+
+        Method loadFactor = mapType.getDeclaredMethod("loadFactor");
+        loadFactor.setAccessible(true);
+        // 默认负载因子为0.75
+        assert (float) loadFactor.invoke(map) == 0.75;
+
+        Field table = mapType.getDeclaredField("table");
+        table.setAccessible(true);
+        // 数组延迟到第一次put才分配空间
+        assert table.get(map) == null;
+        map.put(1, 1);
+        assert table.get(map) != null;
+
+        for (int i = 2; i <= 16; i++) {
             map.put(i, i);
-            Class<?> mapType = map.getClass();
-            Method capacity = mapType.getDeclaredMethod("capacity");
-            capacity.setAccessible(true);
             assert i != 12 || (int) capacity.invoke(map) == 16;
+            // 元素个数大于容量乘以负载因子时，容量扩大为原来的两倍
             assert i != 13 || (int) capacity.invoke(map) == 32;
         }
     }
@@ -53,10 +70,10 @@ public class HashMapTest {
     }
 
     /**
-     * put计算index时，hash对2的幂次方的容量取模，等价于hash和2的幂次方的容量减1进行&运算
+     * 计算index时，hash对2的幂次方的容量取模，等价于hash和2的幂次方的容量减1进行&运算
      */
     @Test
-    public void testPutIndexFor() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void testIndexFor() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String key = "abc";
         Map<String, String> map = new HashMap<>();
         Class<?> mapType = map.getClass();
