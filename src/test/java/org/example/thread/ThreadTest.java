@@ -11,6 +11,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class ThreadTest {
     private int sum = 0;
+    private char[] letters = new char[]{'a', 'b', 'c'};
+    private char[] nums = new char[]{'1', '2', '3'};
+    private int i = 0;
+    private int j = 0;
+    StringBuilder result = new StringBuilder();
     /**
      * 测试原子性问题
      */
@@ -18,7 +23,7 @@ public class ThreadTest {
     public void testAtomicityProblem() {
         ThreadPoolExecutor threadPoolExecutor = ThreadUtil.getThreadPoolExecutor("thread-test-");
         for (int i = 0; i < 1000; i++) {
-            threadPoolExecutor.execute(()->{
+            threadPoolExecutor.execute(() -> {
                 sum++;
             });
         }
@@ -36,6 +41,53 @@ public class ThreadTest {
         testThreadStateWaiting();
         testThreadStateTimedWaiting();
         testThreadStateTerminated();
+    }
+
+    @Test
+    public void testAlternateOutputByWaitNotify() throws InterruptedException {
+        CountDownLatch controlThreadPriority = new CountDownLatch(1);
+        Object lock = new Object();
+        Thread threadA = new Thread(() -> {
+            try {
+                controlThreadPriority.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            synchronized (lock) {
+                while (i < letters.length) {
+                    result.append(letters[i++]);
+                    lock.notify();
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                lock.notify();
+            }
+        });
+        threadA.start();
+        Thread threadB = new Thread(() -> {
+            synchronized (lock) {
+                controlThreadPriority.countDown();
+                while (j < nums.length) {
+                    result.append(nums[j++]);
+                    lock.notify();
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                lock.notify();
+            }
+        });
+        threadB.start();
+        threadA.join();
+        threadB.join();
+        assert result.toString().equals("1a2b3c");
+        assert threadA.getState() == Thread.State.TERMINATED;
+        assert threadB.getState() == Thread.State.TERMINATED;
     }
 
     private static void testThreadStateTerminated() {
@@ -128,7 +180,7 @@ public class ThreadTest {
 
     private static void testThreadStateBlocked() {
         Object lock = new Object();
-        new Thread(()->{
+        new Thread(() -> {
             synchronized (lock) {
                 try {
                     Thread.sleep(1000);
@@ -180,8 +232,8 @@ public class ThreadTest {
         System.out.println(OSHIUtil.getHardwareInfo(Hardware.CPU));
         for (int i = 0; i < 16; i++) {
             int finalI = i;
-            new Thread(()->{
-                NIOUtil.copyByFileChannel("C:\\from\\ideaIC-2021.1.3.exe", "C:\\to\\ideaIC-2021.1.3"+ finalI +".exe");
+            new Thread(() -> {
+                NIOUtil.copyByFileChannel("C:\\from\\ideaIC-2021.1.3.exe", "C:\\to\\ideaIC-2021.1.3" + finalI + ".exe");
                 countDownLatch.countDown();
             }).start();
         }
@@ -198,8 +250,8 @@ public class ThreadTest {
     public void testMultithreadingDisadvantage() {
         System.out.println(OSHIUtil.getHardwareInfo(Hardware.CPU));
         for (int i = 0; i < 16; i++) {
-            new Thread(()->{
-                for (;;){
+            new Thread(() -> {
+                for (; ; ) {
 
                 }
             }).start();
