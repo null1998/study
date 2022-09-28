@@ -1,0 +1,2 @@
+org.example.spi.HelloEnglishServiceProviderImpl
+org.example.spi.HelloChineseServiceProviderImpl
