@@ -15,7 +15,7 @@ public class BIOTest {
             ThreadPoolExecutor threadPoolExecutor = ThreadUtil.getThreadPoolExecutor("bio-test-");
             for (; ; ) {
                 Socket socket = serverSocket.accept();
-                threadPoolExecutor.submit(() -> {
+                threadPoolExecutor.execute(() -> {
                     try (Socket autoCloseSocket = socket;
                          Reader reader = new InputStreamReader(autoCloseSocket.getInputStream())) {
                         StringBuilder sb = new StringBuilder();
