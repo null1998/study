@@ -37,6 +37,11 @@
       <artifactId>oshi-core</artifactId>
       <version>3.5.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.rocketmq</groupId>
+      <artifactId>rocketmq-client</artifactId>
+      <version>4.7.1</version>
+    </dependency>
   </dependencies>
 
   <build>
