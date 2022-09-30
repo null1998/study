@@ -1,13 +1,14 @@
 package org.example.thread;
 
 import org.example.common.Hardware;
+import org.example.config.RedissonConfiguration;
 import org.example.util.NIOUtil;
 import org.example.util.OSHIUtil;
 import org.example.util.ThreadUtil;
 import org.junit.Test;
+import org.redisson.api.RedissonClient;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 public class ThreadTest {
     private int sum = 0;
@@ -259,5 +260,21 @@ public class ThreadTest {
         while (true) {
             System.out.println(OSHIUtil.getHardwareInfo(Hardware.CPU));
         }
+    }
+
+    /**
+     * 测试双重校验锁在并发环境下能否正确获得redissonClient单例
+     */
+    @Test
+    public void testDoubleCheckSingleTon() throws InterruptedException {
+        CopyOnWriteArraySet<RedissonClient> redissonClients = new CopyOnWriteArraySet<>();
+        ThreadPoolExecutor threadPoolExecutor = ThreadUtil.getThreadPoolExecutor(48, new SynchronousQueue<>(), "thread-test-");
+        for (int i = 0; i < 24; i++) {
+            threadPoolExecutor.execute(()->{
+                redissonClients.add(RedissonConfiguration.getRedissonClient());
+            });
+        }
+        threadPoolExecutor.awaitTermination(2, TimeUnit.SECONDS);
+        assert redissonClients.size() == 1;
     }
 }
