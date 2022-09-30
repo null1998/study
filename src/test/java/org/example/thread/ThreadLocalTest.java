@@ -154,24 +154,34 @@ public class ThreadLocalTest {
     }
 
     /**
-     * 测试TransmittableThreadLocal在线程池环境下在父子线程中传递threadLocal
+     * 测试TransmittableThreadLocal在线程池环境下在父子线程中传递threadLocal，不受线程池影响，可以在生产中使用
      */
     @Test
     public void testTransmittableThreadLocal() throws InterruptedException {
         TRANSMITTABLE_THREAD_LOCAL_STRING.set("父线程的值");
+        // 创建只有一个线程的线程池，测试复用线程情况下的TransmittableThreadLocal
         ThreadPoolExecutor threadPoolExecutor = ThreadUtil.getThreadPoolExecutor(1, new LinkedBlockingDeque<>(4), "test-threadLocal-");
         for (int i = 0; i < 2; i++) {
             threadPoolExecutor.execute(TtlRunnable.get(() -> {
+                // 每次执行任务，子线程都会复制threadLocal
                 assert "父线程的值".equals(TRANSMITTABLE_THREAD_LOCAL_STRING.get());
                 TRANSMITTABLE_THREAD_LOCAL_STRING.remove();
             }));
         }
+        // 父线程更新threadLocal，会影响后续子线程执行任务时复制的threadLocal值
         TRANSMITTABLE_THREAD_LOCAL_STRING.set("父线程的值更新");
         for (int i = 0; i < 2; i++) {
+            int fi = i;
             threadPoolExecutor.execute(TtlRunnable.get(() -> {
                 assert "父线程的值更新".equals(TRANSMITTABLE_THREAD_LOCAL_STRING.get());
+                if (fi == 0) {
+                    // 在执行的任务中修改threadLocal，作用域仅限本次任务，不会影响此线程后续执行任务的threadLocal，也不会影响父线程的threadLocal
+                    TRANSMITTABLE_THREAD_LOCAL_STRING.set("子线程的值");
+                }
+                assert fi != 1 || "父线程的值更新".equals(TRANSMITTABLE_THREAD_LOCAL_STRING.get());
             }));
         }
+        assert "父线程的值更新".equals(TRANSMITTABLE_THREAD_LOCAL_STRING.get());
         threadPoolExecutor.awaitTermination(100, TimeUnit.MILLISECONDS);
     }
 }
