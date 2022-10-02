@@ -1,6 +1,7 @@
 package org.example.database;
 
 import org.example.DataBaseService;
+import org.example.StudentDao;
 import org.example.config.RedissonConfiguration;
 import org.example.util.ThreadUtil;
 import org.junit.jupiter.api.Test;
@@ -9,11 +10,16 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+
 @SpringBootTest
 public class RedisTest {
     @Autowired
     private DataBaseService dataBaseService;
+
+    @Autowired
+    private StudentDao studentDao;
+
     /**
      * 测试LockWatchdogTimeout机制对redis锁时间进行自动延长，redis键的格式为node id:thread id
      */
@@ -29,11 +35,11 @@ public class RedisTest {
 
     @Test
     public void testGet() {
-        assert "hello-6".equals(dataBaseService.getById("6"));
+        assert "10000".equals(dataBaseService.getById("10000"));
     }
 
     @Test
     public void testRemove() {
-        dataBaseService.removeById("6");
+        dataBaseService.removeById("1");
     }
 }

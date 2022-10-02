@@ -10,18 +10,28 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 
 @SpringBootApplication
 @EnableCaching
+@RestController
 public class Application {
     @Autowired
     private DataBaseService dataBaseService;
+
+    @Autowired
+    private StudentDao studentDao;
+
+    private final Semaphore semaphore = new Semaphore(1);
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -45,5 +55,18 @@ public class Application {
         config.put("cache_l1", new CacheConfig(ttl, ttl));
         config.put("cache_l2", new CacheConfig(ttl, ttl));
         return new DefaultAutoExpireCacheManager(redissonClient, config);
+    }
+
+    @GetMapping("/limit/{id}")
+    public String getById(@PathVariable String id) throws InterruptedException {
+        semaphore.acquire();
+        String name = studentDao.getById(id);
+        semaphore.release();
+        return name;
+    }
+
+    @GetMapping("/cache/{id}")
+    public String getCacheById(@PathVariable String id) {
+        return dataBaseService.getById(id);
     }
 }
