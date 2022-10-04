@@ -9,6 +9,8 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 @SpringBootTest
@@ -93,6 +95,22 @@ public class MySQLTest {
             manager.rollback(status);
             throw e;
         }
+    }
+
+    /**
+     * 测试一次性删除数据和在一个连接中分批次删除数据的时间对比，
+     * 分批次删除可以减少删除大量数据时cpu的负载，可以减少锁的持有范围
+     */
+    @Test
+    public void testDeleteByLimit() {
+        LocalDateTime time = LocalDateTime.now();
+        jdbcTemplate.update("delete from student limit 10000");
+        System.out.println(ChronoUnit.MILLIS.between(time, LocalDateTime.now()));
+        LocalDateTime time1 = LocalDateTime.now();
+        for (int i = 0; i < 20; i++) {
+            jdbcTemplate.update("delete from student limit 500");
+        }
+        System.out.println(ChronoUnit.MILLIS.between(time1, LocalDateTime.now()));
     }
 
     private void insertRow() {
