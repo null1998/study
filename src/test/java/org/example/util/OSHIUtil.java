@@ -21,7 +21,9 @@ public class OSHIUtil {
         long ioWait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
         long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
         long totalCpu = user + nice + cSys + idle + ioWait + irq + softIrq + steal;
-
+        if (totalCpu == 0) {
+            return "暂时无法统计CPU情况";
+        }
         StringBuilder builder = new StringBuilder();
         for (Hardware hardware : hardwareArray) {
             if (hardware == Hardware.CPU) {

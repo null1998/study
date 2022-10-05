@@ -2,6 +2,7 @@ package org.example.thread;
 
 import org.example.common.Hardware;
 import org.example.config.RedissonConfiguration;
+import org.example.util.JOLUtil;
 import org.example.util.NIOUtil;
 import org.example.util.OSHIUtil;
 import org.example.util.ThreadUtil;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import org.redisson.api.RedissonClient;
 
 import java.util.concurrent.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ThreadTest {
     private int sum = 0;
@@ -250,7 +252,7 @@ public class ThreadTest {
     @Test
     public void testMultithreadingDisadvantage() {
         System.out.println(OSHIUtil.getHardwareInfo(Hardware.CPU));
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 1; i++) {
             new Thread(() -> {
                 for (; ; ) {
 
@@ -276,5 +278,33 @@ public class ThreadTest {
         }
         threadPoolExecutor.awaitTermination(2, TimeUnit.SECONDS);
         assert redissonClients.size() == 1;
+    }
+
+    @Test
+    public void testDeadLock() throws InterruptedException {
+        ReentrantLock lockA = new ReentrantLock();
+        ReentrantLock lockB = new ReentrantLock();
+        Thread threadA = new Thread(() -> {
+            synchronized (lockA) {
+                JOLUtil.printJavaObjectLayout(lockA);
+                ThreadUtil.sleep(100);
+                synchronized (lockB) {
+                    JOLUtil.printJavaObjectLayout(lockB);
+                }
+            }
+        });
+        threadA.start();
+        Thread threadB = new Thread(() -> {
+            synchronized (lockB) {
+                JOLUtil.printJavaObjectLayout(lockB);
+                ThreadUtil.sleep(100);
+                synchronized (lockA) {
+                    JOLUtil.printJavaObjectLayout(lockA);
+                }
+            }
+        });
+        threadB.start();
+        threadA.join();
+        threadB.join();
     }
 }
