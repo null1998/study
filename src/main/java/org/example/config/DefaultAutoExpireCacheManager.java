@@ -1,4 +1,4 @@
-package org.example;
+package org.example.config;
 
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;

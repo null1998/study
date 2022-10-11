@@ -1,7 +1,7 @@
 package org.example.database;
 
-import org.example.DataBaseService;
-import org.example.StudentDao;
+import org.example.service.DataBaseService;
+import org.example.dao.StudentDao;
 import org.example.config.RedissonConfiguration;
 import org.example.util.ThreadUtil;
 import org.junit.jupiter.api.Test;
