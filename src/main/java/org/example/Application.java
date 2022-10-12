@@ -14,11 +14,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -60,6 +62,11 @@ public class Application {
         config.put("cache_l1", new CacheConfig(ttl, ttl));
         config.put("cache_l2", new CacheConfig(ttl, ttl));
         return new DefaultAutoExpireCacheManager(redissonClient, config);
+    }
+
+    @Bean
+    PlatformTransactionManager txManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 
     @GetMapping("/limit/{id}")

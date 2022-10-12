@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 
 @Service
-public class TransactionChildService {
+public class TransactionCalleeService {
     @Resource
     private StudentMapper studentMapper;
 
@@ -54,6 +54,12 @@ public class TransactionChildService {
         studentMapper.insert(student);
     }
 
+    @Transactional(rollbackFor = Throwable.class, propagation = Propagation.REQUIRES_NEW)
+    public void testPropagationRequiresNewThrowException() {
+        throw new RuntimeException("测试异常");
+    }
+
+
     /**
      * NOT_SUPPORTED，不支持事务，方法运行时若已处在一个事务中，则挂起该事务，方法调用完毕后恢复该事务
      *
@@ -62,6 +68,7 @@ public class TransactionChildService {
     @Transactional(rollbackFor = Throwable.class, propagation = Propagation.NOT_SUPPORTED)
     public void testPropagationNotSupported(Student student) {
         studentMapper.insert(student);
+        throw new RuntimeException("测试异常");
     }
 
     /**
@@ -72,15 +79,22 @@ public class TransactionChildService {
     @Transactional(rollbackFor = Throwable.class, propagation = Propagation.NEVER)
     public void testPropagationNever(Student student) {
         studentMapper.insert(student);
+        throw new RuntimeException("测试异常");
     }
 
     /**
      * NESTED，内部事务的回滚不影响外部事务，只对DataSourceTransactionManager事务管理器起效
-     *
-     * @param student 实体
      */
     @Transactional(rollbackFor = Throwable.class, propagation = Propagation.NESTED)
     public void testPropagationNested(Student student) {
         studentMapper.insert(student);
+    }
+
+    /**
+     * NESTED，内部事务的回滚不影响外部事务，只对DataSourceTransactionManager事务管理器起效
+     */
+    @Transactional(rollbackFor = Throwable.class, propagation = Propagation.NESTED)
+    public void testPropagationNestedThrowException() {
+        throw new RuntimeException("测试异常");
     }
 }

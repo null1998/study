@@ -3,7 +3,7 @@ package org.example.spring;
 import org.example.dao.StudentMapper;
 import org.example.entity.Student;
 import org.example.service.DataBaseService;
-import org.example.service.TransactionParentService;
+import org.example.service.TransactionCallerService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +18,7 @@ public class TransactionalTest {
     private DataBaseService dataBaseService;
 
     @Resource
-    private TransactionParentService transactionParentService;
+    private TransactionCallerService transactionCallerService;
 
     @Resource
     private StudentMapper studentMapper;
@@ -33,104 +33,181 @@ public class TransactionalTest {
 
     /**
      * 测试场景
-     * 父类无事务->调用子类事务传播为默认REQUIRED->子类创建独立新事务->父类抛出异常->子类数据提交
+     * 调用者无事务->调用被调用者事务传播为默认REQUIRED->被调用者创建独立新事务->调用者抛出异常->被调用者数据提交
      */
     @Test
-    public void testParentNoTransactionThrowExceptionChildPropagationRequired() {
+    public void testCallerNoTransactionThrowExceptionCalleePropagationRequired() {
         Student student = init();
         Assert.assertThrows(RuntimeException.class, () -> {
-            transactionParentService.noTransactionThrowExceptionChildPropagationRequired(student);
+            transactionCallerService.noTransactionThrowExceptionCalleePropagationRequired(student);
         });
         assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
     /**
      * 测试场景
-     * 父类有事务->调用子类事务传播为默认REQUIRED->子类加入父类事务->父类抛出异常->子类数据回滚
+     * 调用者有事务->调用被调用者事务传播为默认REQUIRED->被调用者加入调用者事务->调用者抛出异常->被调用者数据回滚
      */
     @Test
-    public void testParentHasTransactionThrowExceptionChildPropagationRequired() {
+    public void testCallerHasTransactionThrowExceptionCalleePropagationRequired() {
         Student student = init();
         Assert.assertThrows(RuntimeException.class, () -> {
-            transactionParentService.hasTransactionThrowExceptionChildPropagationRequired(student);
+            transactionCallerService.hasTransactionThrowExceptionCalleePropagationRequired(student);
         });
         assert !studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
     /**
      * 测试场景
-     * 父类无事务->调用子类事务传播为SUPPORTS->子类无事务->子类抛出异常->数据提交
+     * 调用者无事务->调用被调用者事务传播为SUPPORTS->被调用者无事务->被调用者抛出异常->数据提交
      */
     @Test
-    public void testParentNoTransactionChildPropagationSupportsThrowException() {
+    public void testCallerNoTransactionCalleePropagationSupportsThrowException() {
         Student student = init();
         Assert.assertThrows(RuntimeException.class, () -> {
-            transactionParentService.noTransactionChildPropagationSupportsThrowException(student);
+            transactionCallerService.noTransactionCalleePropagationSupportsThrowException(student);
         });
         assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
     /**
      * 测试场景
-     * 父类有事务->调用子类事务传播为SUPPORTS->子类加入父类事务->子类抛出异常->数据回滚
+     * 调用者有事务->调用被调用者事务传播为SUPPORTS->被调用者加入调用者事务->被调用者抛出异常->数据回滚
      */
     @Test
-    public void testParentHasTransactionChildPropagationSupportsThrowException() {
+    public void testCallerHasTransactionCalleePropagationSupportsThrowException() {
         Student student = init();
         Assert.assertThrows(RuntimeException.class, () -> {
-            transactionParentService.hasTransactionChildPropagationSupportsThrowException(student);
+            transactionCallerService.hasTransactionCalleePropagationSupportsThrowException(student);
         });
         assert !studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
     /**
      * 测试场景
-     * 父类无事务->调用子类事务传播为MANDATORY->子类抛出异常IllegalTransactionStateException
+     * 调用者无事务->调用被调用者事务传播为MANDATORY->被调用者抛出异常IllegalTransactionStateException
      */
     @Test
-    public void testParentNoTransactionChildPropagationMandatory() {
+    public void testCallerNoTransactionCalleePropagationMandatory() {
         Assert.assertThrows(IllegalTransactionStateException.class, () -> {
-            transactionParentService.noTransactionChildPropagationMandatory();
+            transactionCallerService.noTransactionCalleePropagationMandatory();
         });
     }
 
     /**
      * 测试场景
-     * 父类有事务->调用子类事务传播为MANDATORY->子类加入父类事务->父类抛出error->子类数据回滚
+     * 调用者有事务->调用被调用者事务传播为MANDATORY->被调用者加入调用者事务->调用者抛出error->被调用者数据回滚
      */
     @Test
-    public void testParentHasTransactionThrowErrorChildPropagationMandatory() {
+    public void testCallerHasTransactionThrowErrorCalleePropagationMandatory() {
         Student student = init();
         Assert.assertThrows(Error.class, () -> {
-            transactionParentService.hasTransactionThrowErrorChildPropagationMandatory(student);
+            transactionCallerService.hasTransactionThrowErrorCalleePropagationMandatory(student);
         });
         assert !studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
     /**
      * 测试场景
-     * 父类无事务->调用子类事务传播为REQUIRES_NEW->子类创建独立新事务->父类抛出异常->子类数据提交
+     * 调用者无事务->调用被调用者事务传播为REQUIRES_NEW->被调用者创建独立新事务->调用者抛出异常->被调用者数据提交
      */
     @Test
-    public void testParentNoTransactionThrowExceptionChildPropagationRequiresNew() {
+    public void testCallerNoTransactionThrowExceptionCalleePropagationRequiresNew() {
         Student student = init();
         Assert.assertThrows(RuntimeException.class, () -> {
-            transactionParentService.noTransactionThrowExceptionChildPropagationRequiresNew(student);
+            transactionCallerService.noTransactionThrowExceptionCalleePropagationRequiresNew(student);
         });
         assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
     /**
      * 测试场景
-     * 父类无事务->调用子类事务传播为REQUIRES_NEW->子类创建独立新事务并挂起父类事务->父类抛出异常->子类数据提交
+     * 调用者有事务->调用被调用者事务传播为REQUIRES_NEW->被调用者创建独立新事务并挂起调用者事务->调用者抛出异常->被调用者数据提交
      */
     @Test
-    public void testParentHasTransactionThrowExceptionChildPropagationRequiresNew() {
+    public void testCallerHasTransactionThrowExceptionCalleePropagationRequiresNew() {
         Student student = init();
         Assert.assertThrows(RuntimeException.class, () -> {
-            transactionParentService.hasTransactionThrowExceptionChildPropagationRequiresNew(student);
+            transactionCallerService.hasTransactionThrowExceptionCalleePropagationRequiresNew(student);
         });
         assert studentMapper.selectByPrimaryKey("1").isPresent();
+    }
+
+    /**
+     * 测试场景
+     * 调用者有事务->调用被调用者事务传播为REQUIRES_NEW->被调用者创建独立新事务并挂起调用者事务->被调用者抛出异常->调用者数据回滚
+     */
+    @Test
+    public void testCallerHasTransactionCalleePropagationRequiresNewThrowException() {
+        Student student = init();
+        Assert.assertThrows(RuntimeException.class, () -> {
+            transactionCallerService.hasTransactionInsertCalleePropagationRequiresNewThrowException(student);
+        });
+        assert !studentMapper.selectByPrimaryKey("1").isPresent();
+    }
+
+    /**
+     * 测试场景
+     * 调用者有事务->调用被调用者事务传播为NOT_SUPPORTED->被调用者不支持事务->被调用者插入数据后抛出异常->被调用者数据已提交
+     */
+    @Test
+    public void testCallerHasTransactionCalleePropagationNotSupported() {
+        Student student = init();
+        Assert.assertThrows(RuntimeException.class, () -> {
+            transactionCallerService.hasTransactionCalleePropagationNotSupported(student);
+        });
+        assert studentMapper.selectByPrimaryKey("1").isPresent();
+    }
+
+    /**
+     * 测试场景
+     * 调用者无事务->调用被调用者事务传播为NEVER->被调用者不支持事务->被调用者插入数据后抛出异常->被调用者数据已提交
+     */
+    @Test
+    public void testCallerNoTransactionCalleePropagationNever() {
+        Student student = init();
+        Assert.assertThrows(RuntimeException.class, () -> {
+            transactionCallerService.noTransactionCalleePropagationNever(student);
+        });
+        assert studentMapper.selectByPrimaryKey("1").isPresent();
+    }
+
+    /**
+     * 测试场景
+     * 调用者有事务->调用被调用者事务传播为NEVER->被调用者不支持事务->被调用者抛出异常IllegalTransactionStateException
+     */
+    @Test
+    public void testCallerHasTransactionCalleePropagationNever() {
+        Student student = init();
+        Assert.assertThrows(IllegalTransactionStateException.class, () -> {
+            transactionCallerService.hasTransactionCalleePropagationNever(student);
+        });
+    }
+
+    /**
+     * 测试场景
+     * 调用者有事务->调用被调用者事务传播为NESTED->被调用者抛出异常回滚，异常在调用者处被捕获不影响调用者->调用者数据提交
+     * 只对DataSourceTransactionManager事务管理器起效
+     */
+    @Test
+    public void testCallerHasTransactionTryCatchCalleePropagationNested() {
+        Student student = init();
+        transactionCallerService.hasTransactionTryCatchCalleePropagationNested(student);
+        assert studentMapper.selectByPrimaryKey("1").isPresent();
+    }
+
+    /**
+     * 测试场景
+     * 调用者有事务->调用被调用者事务传播为NESTED->调用者抛出异常回滚->被调用者受外层事务影响，被调用者数据回滚
+     * 只对DataSourceTransactionManager事务管理器起效
+     */
+    @Test
+    public void testCallerHasTransactionThrowExceptionCalleePropagationNested() {
+        Student student = init();
+        Assert.assertThrows(RuntimeException.class, () -> {
+            transactionCallerService.hasTransactionThrowExceptionCalleePropagationNested(student);
+        });
+        assert !studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
     /**
