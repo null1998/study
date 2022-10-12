@@ -2,7 +2,6 @@ package org.example.spring;
 
 import org.example.dao.StudentMapper;
 import org.example.entity.Student;
-import org.example.service.DataBaseService;
 import org.example.service.TransactionCallerService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -15,21 +14,10 @@ import javax.annotation.Resource;
 public class TransactionalTest {
 
     @Resource
-    private DataBaseService dataBaseService;
-
-    @Resource
     private TransactionCallerService transactionCallerService;
 
     @Resource
     private StudentMapper studentMapper;
-
-    @Test
-    public void testTransactional() {
-        Student student = new Student();
-        student.setId("1");
-        student.setName("张三");
-        dataBaseService.save(student);
-    }
 
     /**
      * 测试场景

@@ -15,12 +15,13 @@ public class NIOUtil {
             }
         }
     }
+
     public static void copyByFileChannel(String srcPath, String destPath) {
         try (FileInputStream fileInputStream = new FileInputStream(srcPath);
              FileOutputStream fileOutputStream = new FileOutputStream(destPath)) {
             FileChannel fileInputStreamChannel = fileInputStream.getChannel();
             FileChannel fileOutputStreamChannel = fileOutputStream.getChannel();
-            fileInputStreamChannel.transferTo(0,fileInputStreamChannel.size(), fileOutputStreamChannel);
+            fileInputStreamChannel.transferTo(0, fileInputStreamChannel.size(), fileOutputStreamChannel);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

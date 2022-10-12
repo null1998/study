@@ -32,13 +32,11 @@ import java.util.concurrent.Semaphore;
 @EnableCaching
 @RestController
 public class Application {
+    private final Semaphore semaphore = new Semaphore(1);
     @Autowired
     private DataBaseService dataBaseService;
-
     @Autowired
     private StudentDao studentDao;
-
-    private final Semaphore semaphore = new Semaphore(1);
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

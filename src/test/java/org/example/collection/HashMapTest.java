@@ -11,6 +11,19 @@ import java.util.Set;
 import java.util.concurrent.*;
 
 public class HashMapTest {
+    private final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+            4,
+            8,
+            16,
+            TimeUnit.SECONDS,
+            new LinkedBlockingDeque<>(32),
+            (Runnable r) -> {
+                Thread t = new Thread(r);
+                t.setName("hashmap-test-" + t.getId());
+                return t;
+            },
+            new ThreadPoolExecutor.AbortPolicy());
+
     /**
      * 默认初始化容量为16，kv数量大于容量的0.75倍时，容量以乘以2的方式扩容
      */
@@ -100,19 +113,6 @@ public class HashMapTest {
         assert (h1 & (2 - 1)) == (h1 & (4 - 1));
         assert ((h2 & (2 - 1)) + 2) == (h2 & (4 - 1));
     }
-
-    private final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
-            4,
-            8,
-            16,
-            TimeUnit.SECONDS,
-            new LinkedBlockingDeque<>(32),
-            (Runnable r) -> {
-                Thread t = new Thread(r);
-                t.setName("hashmap-test-" + t.getId());
-                return t;
-            },
-            new ThreadPoolExecutor.AbortPolicy());
 
     /**
      * put并发时，相同位置的键值对可能会被覆盖

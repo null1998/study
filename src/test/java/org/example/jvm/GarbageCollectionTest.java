@@ -12,9 +12,9 @@ public class GarbageCollectionTest {
     @Test
     public void testReferenceCount() {
         class ReferenceCountGC {
-            public ReferenceCountGC referenceCountGC;
             private static final int _1MB = 1024 * 1024;
             private final byte[] payload = new byte[200 * _1MB];
+            public ReferenceCountGC referenceCountGC;
         }
         ReferenceCountGC a = new ReferenceCountGC();
         ReferenceCountGC b = new ReferenceCountGC();

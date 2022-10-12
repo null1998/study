@@ -13,7 +13,7 @@ public class StudentDao {
     private JdbcTemplate jdbcTemplate;
 
     public String getById(String id) {
-        return jdbcTemplate.queryForObject("select name from student where id = ?", new Object[]{id}, new int[] {Types.VARCHAR}, String.class);
+        return jdbcTemplate.queryForObject("select name from student where id = ?", new Object[]{id}, new int[]{Types.VARCHAR}, String.class);
     }
 
     public void save(Student student) {

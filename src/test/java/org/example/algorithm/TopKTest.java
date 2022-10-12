@@ -67,8 +67,8 @@ public class TopKTest {
 
 class MaxHeap {
     private final int limit;
-    private int size;
     private final LocalDateTime[] maxHeap;
+    private int size;
 
     public MaxHeap(int limit) {
         this.limit = limit;

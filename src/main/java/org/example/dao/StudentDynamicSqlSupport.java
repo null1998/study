@@ -1,9 +1,10 @@
 package org.example.dao;
 
-import java.sql.JDBCType;
-import javax.annotation.Generated;
 import org.mybatis.dynamic.sql.SqlColumn;
 import org.mybatis.dynamic.sql.SqlTable;
+
+import javax.annotation.Generated;
+import java.sql.JDBCType;
 
 public final class StudentDynamicSqlSupport {
     @Generated("org.mybatis.generator.api.MyBatisGenerator")

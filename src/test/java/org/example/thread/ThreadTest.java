@@ -13,85 +13,12 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ThreadTest {
+    StringBuilder result = new StringBuilder();
     private int sum = 0;
     private char[] letters = new char[]{'a', 'b', 'c'};
     private char[] nums = new char[]{'1', '2', '3'};
     private int i = 0;
     private int j = 0;
-    StringBuilder result = new StringBuilder();
-    /**
-     * 测试原子性问题
-     */
-    @Test
-    public void testAtomicityProblem() {
-        ThreadPoolExecutor threadPoolExecutor = ThreadUtil.getThreadPoolExecutor("thread-test-");
-        for (int i = 0; i < 1000; i++) {
-            threadPoolExecutor.execute(() -> {
-                sum++;
-            });
-        }
-        assert sum != 1000;
-    }
-
-    /**
-     * 测试线程的六种状态
-     */
-    @Test
-    public void testThreadState() {
-        testThreadStateNew();
-        testThreadStateRunnable();
-        testThreadStateBlocked();
-        testThreadStateWaiting();
-        testThreadStateTimedWaiting();
-        testThreadStateTerminated();
-    }
-
-    @Test
-    public void testAlternateOutputByWaitNotify() throws InterruptedException {
-        CountDownLatch controlThreadPriority = new CountDownLatch(1);
-        Object lock = new Object();
-        Thread threadA = new Thread(() -> {
-            try {
-                controlThreadPriority.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            synchronized (lock) {
-                while (i < letters.length) {
-                    result.append(letters[i++]);
-                    lock.notify();
-                    try {
-                        lock.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                lock.notify();
-            }
-        });
-        threadA.start();
-        Thread threadB = new Thread(() -> {
-            synchronized (lock) {
-                controlThreadPriority.countDown();
-                while (j < nums.length) {
-                    result.append(nums[j++]);
-                    lock.notify();
-                    try {
-                        lock.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                lock.notify();
-            }
-        });
-        threadB.start();
-        threadA.join();
-        threadB.join();
-        assert result.toString().equals("1a2b3c");
-        assert threadA.getState() == Thread.State.TERMINATED;
-        assert threadB.getState() == Thread.State.TERMINATED;
-    }
 
     private static void testThreadStateTerminated() {
         Thread threadA = new Thread(() -> {
@@ -226,6 +153,80 @@ public class ThreadTest {
     }
 
     /**
+     * 测试原子性问题
+     */
+    @Test
+    public void testAtomicityProblem() {
+        ThreadPoolExecutor threadPoolExecutor = ThreadUtil.getThreadPoolExecutor("thread-test-");
+        for (int i = 0; i < 1000; i++) {
+            threadPoolExecutor.execute(() -> {
+                sum++;
+            });
+        }
+        assert sum != 1000;
+    }
+
+    /**
+     * 测试线程的六种状态
+     */
+    @Test
+    public void testThreadState() {
+        testThreadStateNew();
+        testThreadStateRunnable();
+        testThreadStateBlocked();
+        testThreadStateWaiting();
+        testThreadStateTimedWaiting();
+        testThreadStateTerminated();
+    }
+
+    @Test
+    public void testAlternateOutputByWaitNotify() throws InterruptedException {
+        CountDownLatch controlThreadPriority = new CountDownLatch(1);
+        Object lock = new Object();
+        Thread threadA = new Thread(() -> {
+            try {
+                controlThreadPriority.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            synchronized (lock) {
+                while (i < letters.length) {
+                    result.append(letters[i++]);
+                    lock.notify();
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                lock.notify();
+            }
+        });
+        threadA.start();
+        Thread threadB = new Thread(() -> {
+            synchronized (lock) {
+                controlThreadPriority.countDown();
+                while (j < nums.length) {
+                    result.append(nums[j++]);
+                    lock.notify();
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                lock.notify();
+            }
+        });
+        threadB.start();
+        threadA.join();
+        threadB.join();
+        assert result.toString().equals("1a2b3c");
+        assert threadA.getState() == Thread.State.TERMINATED;
+        assert threadB.getState() == Thread.State.TERMINATED;
+    }
+
+    /**
      * 测试使用多线程的优势，在io期间cpu是空闲的，io工作由direct memory access完成，
      * 所以多线程可以充分利用cpu在io期间的空闲时间
      */
@@ -272,7 +273,7 @@ public class ThreadTest {
         CopyOnWriteArraySet<RedissonClient> redissonClients = new CopyOnWriteArraySet<>();
         ThreadPoolExecutor threadPoolExecutor = ThreadUtil.getThreadPoolExecutor(48, new SynchronousQueue<>(), "thread-test-");
         for (int i = 0; i < 24; i++) {
-            threadPoolExecutor.execute(()->{
+            threadPoolExecutor.execute(() -> {
                 redissonClients.add(RedissonConfiguration.getRedissonClient());
             });
         }

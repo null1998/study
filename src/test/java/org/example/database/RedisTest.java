@@ -1,8 +1,8 @@
 package org.example.database;
 
-import org.example.service.DataBaseService;
-import org.example.dao.StudentDao;
 import org.example.config.RedissonConfiguration;
+import org.example.dao.StudentDao;
+import org.example.service.DataBaseService;
 import org.example.util.ThreadUtil;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RLock;
@@ -10,7 +10,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
 public class RedisTest {

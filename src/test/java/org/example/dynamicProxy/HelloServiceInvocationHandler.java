@@ -23,12 +23,14 @@ public class HelloServiceInvocationHandler implements InvocationHandler {
         }
         return method.invoke(object, args);
     }
+
     private Object proxySayHello(Method method, Object[] args) throws InvocationTargetException, IllegalAccessException {
         String result = (String) method.invoke(object, args);
-        return  "2022-09-30 " + result;
+        return "2022-09-30 " + result;
     }
+
     private Object proxyAnotherMethod(Method method, Object[] args) throws InvocationTargetException, IllegalAccessException {
         String result = (String) method.invoke(object, args);
-        return  "2022-10-01 " + result;
+        return "2022-10-01 " + result;
     }
 }
