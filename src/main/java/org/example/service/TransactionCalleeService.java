@@ -91,7 +91,7 @@ public class TransactionCalleeService {
     }
 
     /**
-     * NESTED，内部事务的回滚不影响外部事务，只对DataSourceTransactionManager事务管理器起效
+     * NESTED，内部事务的回滚不影响外部事务（外部捕获异常的前提下），外部事务的回滚会影响内部事务，只对DataSourceTransactionManager事务管理器起效
      */
     @Transactional(rollbackFor = Throwable.class, propagation = Propagation.NESTED)
     public void testPropagationNestedThrowException() {
