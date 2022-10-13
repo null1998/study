@@ -6,6 +6,7 @@ import org.example.service.TransactionCallerService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.IllegalTransactionStateException;
 
 import javax.annotation.Resource;
@@ -26,9 +27,7 @@ public class TransactionalTest {
     @Test
     public void testCallerNoTransactionThrowExceptionCalleePropagationRequired() {
         Student student = init();
-        Assert.assertThrows(RuntimeException.class, () -> {
-            transactionCallerService.noTransactionThrowExceptionCalleePropagationRequired(student);
-        });
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.noTransactionThrowExceptionCalleePropagationRequired(student));
         assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -39,9 +38,7 @@ public class TransactionalTest {
     @Test
     public void testCallerHasTransactionThrowExceptionCalleePropagationRequired() {
         Student student = init();
-        Assert.assertThrows(RuntimeException.class, () -> {
-            transactionCallerService.hasTransactionThrowExceptionCalleePropagationRequired(student);
-        });
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.hasTransactionThrowExceptionCalleePropagationRequired(student));
         assert !studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -52,9 +49,7 @@ public class TransactionalTest {
     @Test
     public void testCallerNoTransactionCalleePropagationSupportsThrowException() {
         Student student = init();
-        Assert.assertThrows(RuntimeException.class, () -> {
-            transactionCallerService.noTransactionCalleePropagationSupportsThrowException(student);
-        });
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.noTransactionCalleePropagationSupportsThrowException(student));
         assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -65,9 +60,7 @@ public class TransactionalTest {
     @Test
     public void testCallerHasTransactionCalleePropagationSupportsThrowException() {
         Student student = init();
-        Assert.assertThrows(RuntimeException.class, () -> {
-            transactionCallerService.hasTransactionCalleePropagationSupportsThrowException(student);
-        });
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.hasTransactionCalleePropagationSupportsThrowException(student));
         assert !studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -77,9 +70,7 @@ public class TransactionalTest {
      */
     @Test
     public void testCallerNoTransactionCalleePropagationMandatory() {
-        Assert.assertThrows(IllegalTransactionStateException.class, () -> {
-            transactionCallerService.noTransactionCalleePropagationMandatory();
-        });
+        Assert.assertThrows(IllegalTransactionStateException.class, () -> transactionCallerService.noTransactionCalleePropagationMandatory());
     }
 
     /**
@@ -89,9 +80,7 @@ public class TransactionalTest {
     @Test
     public void testCallerHasTransactionThrowErrorCalleePropagationMandatory() {
         Student student = init();
-        Assert.assertThrows(Error.class, () -> {
-            transactionCallerService.hasTransactionThrowErrorCalleePropagationMandatory(student);
-        });
+        Assert.assertThrows(Error.class, () -> transactionCallerService.hasTransactionThrowErrorCalleePropagationMandatory(student));
         assert !studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -102,9 +91,7 @@ public class TransactionalTest {
     @Test
     public void testCallerNoTransactionThrowExceptionCalleePropagationRequiresNew() {
         Student student = init();
-        Assert.assertThrows(RuntimeException.class, () -> {
-            transactionCallerService.noTransactionThrowExceptionCalleePropagationRequiresNew(student);
-        });
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.noTransactionThrowExceptionCalleePropagationRequiresNew(student));
         assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -115,9 +102,7 @@ public class TransactionalTest {
     @Test
     public void testCallerHasTransactionThrowExceptionCalleePropagationRequiresNew() {
         Student student = init();
-        Assert.assertThrows(RuntimeException.class, () -> {
-            transactionCallerService.hasTransactionThrowExceptionCalleePropagationRequiresNew(student);
-        });
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.hasTransactionThrowExceptionCalleePropagationRequiresNew(student));
         assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -128,9 +113,7 @@ public class TransactionalTest {
     @Test
     public void testCallerHasTransactionCalleePropagationRequiresNewThrowException() {
         Student student = init();
-        Assert.assertThrows(RuntimeException.class, () -> {
-            transactionCallerService.hasTransactionInsertCalleePropagationRequiresNewThrowException(student);
-        });
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.hasTransactionInsertCalleePropagationRequiresNewThrowException(student));
         assert !studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -141,9 +124,7 @@ public class TransactionalTest {
     @Test
     public void testCallerHasTransactionCalleePropagationNotSupported() {
         Student student = init();
-        Assert.assertThrows(RuntimeException.class, () -> {
-            transactionCallerService.hasTransactionCalleePropagationNotSupported(student);
-        });
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.hasTransactionCalleePropagationNotSupported(student));
         assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -154,9 +135,7 @@ public class TransactionalTest {
     @Test
     public void testCallerNoTransactionCalleePropagationNever() {
         Student student = init();
-        Assert.assertThrows(RuntimeException.class, () -> {
-            transactionCallerService.noTransactionCalleePropagationNever(student);
-        });
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.noTransactionCalleePropagationNever(student));
         assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -167,9 +146,7 @@ public class TransactionalTest {
     @Test
     public void testCallerHasTransactionCalleePropagationNever() {
         Student student = init();
-        Assert.assertThrows(IllegalTransactionStateException.class, () -> {
-            transactionCallerService.hasTransactionCalleePropagationNever(student);
-        });
+        Assert.assertThrows(IllegalTransactionStateException.class, () -> transactionCallerService.hasTransactionCalleePropagationNever(student));
     }
 
     /**
@@ -192,10 +169,31 @@ public class TransactionalTest {
     @Test
     public void testCallerHasTransactionThrowExceptionCalleePropagationNested() {
         Student student = init();
-        Assert.assertThrows(RuntimeException.class, () -> {
-            transactionCallerService.hasTransactionThrowExceptionCalleePropagationNested(student);
-        });
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.hasTransactionThrowExceptionCalleePropagationNested(student));
         assert !studentMapper.selectByPrimaryKey("1").isPresent();
+    }
+
+    /**
+     * 测试场景
+     * 调用者有事务，被调用者耗时较长需要异步执行，为保证数据一致性，希望能在调用者事务提交后开始执行异步任务
+     */
+    @Test
+    public void testTransactionSynchronizationManagerCallAfterCommitted() {
+        Student student = init();
+        transactionCallerService.hashTransactionCallAfterCompletion(student);
+        assert !studentMapper.selectByPrimaryKey("1").isPresent();
+    }
+
+    /**
+     * 测试场景
+     * 调用者有事务，被调用者耗时较长需要异步执行，为保证数据一致性，希望能在调用者事务回滚后取消执行异步任务
+     */
+    @Test
+    public void testTransactionSynchronizationManagerCancelAfterRollback() {
+        Student student = init();
+        studentMapper.insert(student);
+        Assert.assertThrows(DuplicateKeyException.class, () -> transactionCallerService.hashTransactionCallAfterCompletion(student));
+        assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
     /**

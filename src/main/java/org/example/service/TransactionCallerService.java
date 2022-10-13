@@ -2,10 +2,14 @@ package org.example.service;
 
 import org.example.dao.StudentMapper;
 import org.example.entity.Student;
+import org.example.util.ThreadUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Service
 public class TransactionCallerService {
@@ -158,5 +162,28 @@ public class TransactionCallerService {
     public void hasTransactionThrowExceptionCalleePropagationNested(Student student) {
         transactionCalleeService.testPropagationNested(student);
         throw new RuntimeException("测试异常");
+    }
+
+    /**
+     * 调用者有事务，被调用者耗时较长需要异步执行，为保证数据一致性，希望能在调用者事务完成后根据事务结果决定是否执行异步任务
+     *
+     * @param student 实体
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public void hashTransactionCallAfterCompletion(Student student) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if (STATUS_COMMITTED == status) {
+                    System.out.println("事务已提交，开始执行异步任务");
+                    ThreadPoolExecutor threadPoolExecutor = ThreadUtil.getThreadPoolExecutor("test-call-after-committed-");
+                    threadPoolExecutor.execute(()-> studentMapper.deleteByPrimaryKey(student.getId()));
+                }
+                if (STATUS_ROLLED_BACK == status) {
+                    System.out.println("事务已回滚，取消执行异步任务");
+                }
+            }
+        });
+        studentMapper.insert(student);
     }
 }
