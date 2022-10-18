@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * @author huang
  */
 @Component
-public class DefaultEventBusListenerImpl implements MyEventBusListener{
+public class DefaultEventBusListenerImpl implements MyEventBusListener {
 
     @Subscribe
     public void listen(DeadEvent deadEvent) {

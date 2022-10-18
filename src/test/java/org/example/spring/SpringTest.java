@@ -37,6 +37,10 @@ public class SpringTest {
         annotationConfigApplicationContext.getBean(StoreB.class);
     }
 
+    interface PersonService {
+        void print();
+    }
+
     @Configuration
     @ComponentScan(basePackageClasses = {StoreA.class, StoreB.class})
     static class MyConfig {
@@ -86,10 +90,6 @@ public class SpringTest {
             this.book = book;
             System.out.println("constructor注入" + this.book);
         }
-    }
-
-    interface PersonService {
-        void print();
     }
 
     @Component

@@ -1,7 +1,9 @@
 package org.example;
 
 import com.google.common.eventbus.EventBus;
+import org.apache.shardingsphere.shardingjdbc.spring.boot.SpringBootConfiguration;
 import org.example.config.DefaultAutoExpireCacheManager;
+import org.example.dao.RegionMapper;
 import org.example.dao.StudentDao;
 import org.example.eventbus.MyEventBusListener;
 import org.example.service.DataBaseService;
@@ -31,7 +33,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {SpringBootConfiguration.class})
 @EnableCaching
 @RestController
 public class Application {
@@ -40,6 +42,8 @@ public class Application {
     private DataBaseService dataBaseService;
     @Resource
     private StudentDao studentDao;
+    @Resource
+    private RegionMapper regionMapper;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -90,5 +94,10 @@ public class Application {
     @GetMapping("/cache/{id}")
     public String getCacheById(@PathVariable String id) {
         return dataBaseService.getById(id);
+    }
+
+    @GetMapping("/compression/{str}")
+    public String testCompression(@PathVariable String str) {
+        return str + new String(new byte[2 * 1024]);
     }
 }

@@ -177,7 +177,7 @@ public class TransactionCallerService {
                 if (STATUS_COMMITTED == status) {
                     System.out.println("事务已提交，开始执行异步任务");
                     ThreadPoolExecutor threadPoolExecutor = ThreadUtil.getThreadPoolExecutor("test-call-after-committed-");
-                    threadPoolExecutor.execute(()-> studentMapper.deleteByPrimaryKey(student.getId()));
+                    threadPoolExecutor.execute(() -> studentMapper.deleteByPrimaryKey(student.getId()));
                 }
                 if (STATUS_ROLLED_BACK == status) {
                     System.out.println("事务已回滚，取消执行异步任务");
