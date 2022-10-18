@@ -30,6 +30,64 @@ public class SpringTest {
         annotationConfigApplicationContext.close();
     }
 
+    @Test
+    public void testAutowiredConstructor() {
+        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(MyConfig.class);
+        annotationConfigApplicationContext.getBean(StoreA.class);
+        annotationConfigApplicationContext.getBean(StoreB.class);
+    }
+
+    @Configuration
+    @ComponentScan(basePackageClasses = {StoreA.class, StoreB.class})
+    static class MyConfig {
+        @Bean
+        public Book book() {
+            Book book = new Book();
+            book.setTitle("title");
+            return book;
+        }
+    }
+
+    static class Book {
+        private String title;
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        @Override
+        public String toString() {
+            return "Book{" +
+                    "title='" + title + '\'' +
+                    '}';
+        }
+    }
+
+    @Component
+    static class StoreA {
+        @Autowired
+        private Book book;
+
+        public StoreA() {
+            System.out.println("setter注入" + this.book);
+        }
+    }
+
+    @Component
+    static class StoreB {
+        private Book book;
+
+        @Autowired
+        public StoreB(Book book) {
+            this.book = book;
+            System.out.println("constructor注入" + this.book);
+        }
+    }
+
     interface PersonService {
         void print();
     }
@@ -49,13 +107,13 @@ public class SpringTest {
 
         @Autowired
         public BusinessPersonService(User user, Company company) {
-            System.out.println("construct-param");
+            System.out.println(this.getClass() + "-construct-param");
             this.user = user;
             this.company = company;
         }
 
         public BusinessPersonService() {
-            System.out.println("construct");
+            System.out.println(this.getClass() + "-construct");
         }
 
         @Override
@@ -82,7 +140,7 @@ public class SpringTest {
 
         @PostConstruct
         public void postConstruct() {
-            System.out.println("postConstruct");
+            System.out.println(this.getClass() + "-postConstruct");
         }
 
         /**
@@ -90,7 +148,7 @@ public class SpringTest {
          */
         @Override
         public void afterPropertiesSet() throws Exception {
-            System.out.println("afterPropertiesSet");
+            System.out.println(this.getClass() + "-afterPropertiesSet");
         }
         // init-method执行顺序
 
@@ -100,7 +158,7 @@ public class SpringTest {
 
         @PreDestroy
         public void preDestroy() {
-            System.out.println("preDestroy");
+            System.out.println(this.getClass() + "-preDestroy");
         }
 
         /**
@@ -108,7 +166,7 @@ public class SpringTest {
          */
         @Override
         public void destroy() throws Exception {
-            System.out.println("destroy");
+            System.out.println(this.getClass() + "-destroy");
         }
 
         // destroy-method执行顺序
