@@ -1,14 +1,15 @@
 package org.example;
 
+import com.google.common.eventbus.EventBus;
 import org.example.config.DefaultAutoExpireCacheManager;
 import org.example.dao.StudentDao;
+import org.example.eventbus.MyEventBusListener;
 import org.example.service.DataBaseService;
 import org.example.util.TimeUtil;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.spring.cache.CacheConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.CacheManager;
@@ -20,10 +21,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
@@ -33,9 +36,9 @@ import java.util.concurrent.Semaphore;
 @RestController
 public class Application {
     private final Semaphore semaphore = new Semaphore(1);
-    @Autowired
+    @Resource
     private DataBaseService dataBaseService;
-    @Autowired
+    @Resource
     private StudentDao studentDao;
 
     public static void main(String[] args) {
@@ -65,6 +68,15 @@ public class Application {
     @Bean
     PlatformTransactionManager txManager(DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
+    }
+
+    @Bean
+    EventBus eventBus(List<MyEventBusListener> eventBusListenerList) {
+        EventBus eventBus = new EventBus();
+        for (MyEventBusListener eventBusListener : eventBusListenerList) {
+            eventBus.register(eventBusListener);
+        }
+        return eventBus;
     }
 
     @GetMapping("/limit/{id}")
