@@ -24,7 +24,9 @@ public class MySQLTest {
      */
     @Test
     public void testRepeatableReadMVCC() throws InterruptedException {
-        TransactionDefinition definition = new DefaultTransactionDefinition();
+        initTeacher();
+        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
+        definition.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
         DataSourceTransactionManager manager = new DataSourceTransactionManager(Objects.requireNonNull(jdbcTemplate.getDataSource()));
         // 开启事务a，当执行第一个查询时创建一致性视图，此后事务a的查询共用此一致性视图
         TransactionStatus status = manager.getTransaction(definition);
@@ -66,7 +68,9 @@ public class MySQLTest {
      */
     @Test
     public void testReadCommittedMVCC() throws InterruptedException {
-        TransactionDefinition definition = new DefaultTransactionDefinition();
+        initTeacher();
+        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
+        definition.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
         DataSourceTransactionManager manager = new DataSourceTransactionManager(Objects.requireNonNull(jdbcTemplate.getDataSource()));
         // 开启事务a
         TransactionStatus status = manager.getTransaction(definition);
@@ -121,4 +125,10 @@ public class MySQLTest {
         jdbcTemplate.update("update teacher set name = '张三-update' where id = 1");
     }
 
+    private void initTeacher() {
+        jdbcTemplate.update("delete from teacher");
+        jdbcTemplate.update("insert into teacher values(1, '张三')");
+        jdbcTemplate.update("insert into teacher values(2, '李四')");
+        jdbcTemplate.update("insert into teacher values(3, '王五')");
+    }
 }

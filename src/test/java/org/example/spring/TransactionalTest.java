@@ -11,6 +11,9 @@ import org.springframework.transaction.IllegalTransactionStateException;
 
 import javax.annotation.Resource;
 
+/**
+ * 搭配mybatis日志输出查看
+ */
 @SpringBootTest
 public class TransactionalTest {
 
@@ -180,7 +183,7 @@ public class TransactionalTest {
     @Test
     public void testTransactionSynchronizationManagerCallAfterCommitted() {
         Student student = init();
-        transactionCallerService.hashTransactionCallAfterCompletion(student);
+        transactionCallerService.hasTransactionCallAfterCompletion(student);
         assert !studentMapper.selectByPrimaryKey("1").isPresent();
     }
 
@@ -192,7 +195,7 @@ public class TransactionalTest {
     public void testTransactionSynchronizationManagerCancelAfterRollback() {
         Student student = init();
         studentMapper.insert(student);
-        Assert.assertThrows(DuplicateKeyException.class, () -> transactionCallerService.hashTransactionCallAfterCompletion(student));
+        Assert.assertThrows(DuplicateKeyException.class, () -> transactionCallerService.hasTransactionCallAfterCompletion(student));
         assert studentMapper.selectByPrimaryKey("1").isPresent();
     }
 

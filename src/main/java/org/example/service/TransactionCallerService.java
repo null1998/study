@@ -170,7 +170,7 @@ public class TransactionCallerService {
      * @param student 实体
      */
     @Transactional(rollbackFor = Throwable.class)
-    public void hashTransactionCallAfterCompletion(Student student) {
+    public void hasTransactionCallAfterCompletion(Student student) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCompletion(int status) {

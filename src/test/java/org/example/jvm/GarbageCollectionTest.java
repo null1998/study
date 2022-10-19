@@ -60,6 +60,7 @@ public class GarbageCollectionTest {
      * -Xmx300m，测试老年代分配担保
      * eden 80MB， from 10MB， to 10MB， old 200MB
      * 50MB对象分配在eden，gc后复制到to失败，触发老年代分配担保，分配到old
+     * （也可能是大对象直接分配到old，需要有控制parallelGC大对象阈值的参数）
      */
     @Test
     public void testOldGenHandlePromotionGC() {

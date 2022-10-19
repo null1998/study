@@ -8,7 +8,7 @@ import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 /**
- * 被不同类型引用描述的对象回收测试，需要增加gc日志分析参数-XX:+PrintGC
+ * 被不同类型引用描述的对象回收测试，需要增加gc日志分析参数-XX:+PrintGCDetails
  */
 public class ReferenceTest {
     /**
