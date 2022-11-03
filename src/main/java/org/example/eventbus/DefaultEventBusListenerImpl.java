@@ -12,6 +12,6 @@ public class DefaultEventBusListenerImpl implements MyEventBusListener {
 
     @Subscribe
     public void listen(DeadEvent deadEvent) {
-        System.out.println(String.format("default %s", deadEvent.getEvent()));
+        throw new RuntimeException(deadEvent.getEvent().toString());
     }
 }

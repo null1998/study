@@ -6,25 +6,25 @@
         <result column="name" jdbcType="VARCHAR" property="name"/>
     </resultMap>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from region
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
+        delete from region
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
     <insert id="insert" parameterType="org.example.entity.Region">
-    insert into region (id, name)
-    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR})
-  </insert>
+        insert into region (id, name)
+        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR})
+    </insert>
     <update id="updateByPrimaryKey" parameterType="org.example.entity.Region">
-    update region
-    set name = #{name,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+        update region
+        set name = #{name,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select id, name
-    from region
-    where id = #{id,jdbcType=INTEGER}
-  </select>
+        select id, name
+        from region
+        where id = #{id,jdbcType=INTEGER}
+    </select>
     <select id="selectAll" resultMap="BaseResultMap">
-    select id, name
-    from region
-  </select>
+        select id, name
+        from region
+    </select>
 </mapper>

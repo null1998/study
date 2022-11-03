@@ -186,4 +186,29 @@ public class TransactionCallerService {
         });
         studentMapper.insert(student);
     }
+
+    /**
+     * 事务中有异常，不抛出
+     */
+    @Transactional
+    public void hasTransactionNotThrowException() {
+        try {
+            transactionCalleeService.testPropagationRequiredThrowException();
+        } catch (Exception e) {
+            System.out.println("捕获了异常，但不抛出");
+        }
+    }
+
+    /**
+     * 事务中有异常，不抛出
+     */
+    @Transactional
+    public void hasTransactionThrowException() {
+        try {
+            transactionCalleeService.testPropagationRequiredThrowException();
+        } catch (Exception e) {
+            System.out.println("捕获了异常，处理后抛出");
+            throw e;
+        }
+    }
 }

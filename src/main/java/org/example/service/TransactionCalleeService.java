@@ -1,10 +1,13 @@
 package org.example.service;
 
+import com.google.common.eventbus.EventBus;
 import org.example.dao.StudentMapper;
 import org.example.entity.Student;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
 
@@ -12,6 +15,9 @@ import javax.annotation.Resource;
 public class TransactionCalleeService {
     @Resource
     private StudentMapper studentMapper;
+
+    @Resource
+    private EventBus eventBus;
 
     /**
      * 默认的事务传播方式REQUIRED，方法运行时若已处在一个事务中，则加入该事务，否则自己创建一个新事务
@@ -21,6 +27,11 @@ public class TransactionCalleeService {
     @Transactional(rollbackFor = Throwable.class)
     public void testPropagationRequired(Student student) {
         studentMapper.insert(student);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void testPropagationRequiredThrowException() {
+        throw new RuntimeException("测试异常");
     }
 
     /**
@@ -96,5 +107,23 @@ public class TransactionCalleeService {
     @Transactional(rollbackFor = Throwable.class, propagation = Propagation.NESTED)
     public void testPropagationNestedThrowException() {
         throw new RuntimeException("测试异常");
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void testEventBusThrowException(Student student) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if (STATUS_COMMITTED == status) {
+                    System.out.println("扣票事务提交");
+
+                }
+                if (STATUS_ROLLED_BACK == status) {
+                    System.out.println("扣票事务回滚");
+                }
+            }
+        });
+        studentMapper.insert(student);
+        eventBus.post("Exception Message");
     }
 }

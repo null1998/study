@@ -2,12 +2,14 @@ package org.example.spring;
 
 import org.example.dao.StudentMapper;
 import org.example.entity.Student;
+import org.example.service.TransactionCalleeService;
 import org.example.service.TransactionCallerService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.IllegalTransactionStateException;
+import org.springframework.transaction.UnexpectedRollbackException;
 
 import javax.annotation.Resource;
 
@@ -19,6 +21,9 @@ public class TransactionalTest {
 
     @Resource
     private TransactionCallerService transactionCallerService;
+
+    @Resource
+    private TransactionCalleeService transactionCalleeService;
 
     @Resource
     private StudentMapper studentMapper;
@@ -197,6 +202,35 @@ public class TransactionalTest {
         studentMapper.insert(student);
         Assert.assertThrows(DuplicateKeyException.class, () -> transactionCallerService.hasTransactionCallAfterCompletion(student));
         assert studentMapper.selectByPrimaryKey("1").isPresent();
+    }
+
+    /**
+     * 测试场景
+     * eventBus消息时抛出异常，不会导致发送消息处的异常回滚
+     */
+    @Test
+    public void testEventBusThrowException() {
+        Student student = init();
+        transactionCalleeService.testEventBusThrowException(student);
+        assert studentMapper.selectByPrimaryKey("1").isPresent();
+    }
+
+    /**
+     * 测试场景
+     * 被调用者抛出了异常，spring将事务标志为rollback only，调用者捕获异常但没有抛出，事务提交，与rollback only 标志不符
+     */
+    @Test
+    public void testHasTransactionNotThrowException() {
+        Assert.assertThrows(UnexpectedRollbackException.class, () -> transactionCallerService.hasTransactionNotThrowException());
+    }
+
+    /**
+     * 测试场景
+     * 被调用者抛出了异常，spring将事务标志为rollback only，调用者捕获异常然后抛出，事务正常回滚
+     */
+    @Test
+    public void testHasTransactionThrowException() {
+        Assert.assertThrows(RuntimeException.class, () -> transactionCallerService.hasTransactionThrowException());
     }
 
     /**
