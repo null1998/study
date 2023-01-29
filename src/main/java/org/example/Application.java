@@ -5,6 +5,7 @@ import org.apache.shardingsphere.shardingjdbc.spring.boot.SpringBootConfiguratio
 import org.example.config.DefaultAutoExpireCacheManager;
 import org.example.dao.RegionMapper;
 import org.example.dao.StudentDao;
+import org.example.entity.Region;
 import org.example.eventbus.MyEventBusListener;
 import org.example.service.DataBaseService;
 import org.example.util.TimeUtil;
@@ -19,9 +20,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -99,5 +98,21 @@ public class Application {
     @GetMapping("/compression/{str}")
     public String testCompression(@PathVariable String str) {
         return str + new String(new byte[2 * 1024]);
+    }
+
+    @GetMapping("/query/region")
+    public Region queryRegionById(@RequestParam Integer id) {
+        Region region = new Region();
+        region.setId(1);
+        region.setName("福建");
+        if (region.getId().equals(id)) {
+            return region;
+        }
+        return null;
+    }
+
+    @PostMapping("/add/region")
+    public Region addRegion(@RequestBody Region region) {
+        return region;
     }
 }
