@@ -1,5 +1,6 @@
 package org.example;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.eventbus.EventBus;
 import org.apache.shardingsphere.shardingjdbc.spring.boot.SpringBootConfiguration;
 import org.example.config.DefaultAutoExpireCacheManager;
@@ -21,9 +22,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import java.io.*;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -114,5 +119,78 @@ public class Application {
     @PostMapping("/add/region")
     public Region addRegion(@RequestBody Region region) {
         return region;
+    }
+
+    /**
+     * 文件上传
+     *
+     * @param files 多个文件情况
+     * @return {@link String}
+     * @throws IOException io异常
+     */
+    @GetMapping("/upload")
+    public String upload(@RequestParam MultipartFile[] files) throws IOException {
+        class UploadFileException extends RuntimeException {
+            public UploadFileException(String message) {
+                super(message);
+            }
+        }
+        for (MultipartFile file : files) {
+            String originalFilename = file.getOriginalFilename();
+            File dest = new File("I:\\storage\\" + originalFilename);
+            if (!dest.getParentFile().exists()) {
+                boolean mkdirs = dest.getParentFile().mkdirs();
+                if (!mkdirs) {
+                    throw new UploadFileException("上传文件失败，服务器创建目录错误");
+                }
+            }
+            file.transferTo(dest);
+        }
+        JSONObject result = new JSONObject();
+        result.put("code","200");
+        result.put("message", "上传文件成功");
+        return result.toString();
+    }
+
+    /**
+     * 文件下载，不建议用接口做，因为文件下载一般都是下载一些静态文件，可以先将文件处理好，
+     * 然后通过nginx服务下载静态文件，速度会快很多
+     *
+     * @param response http响应
+     * @param fileName 下载文件名
+     * @return {@link String}
+     */
+    @GetMapping("/download")
+    public String fileDownLoad(HttpServletResponse response, @RequestParam("fileName") String fileName){
+        class DownLoadException extends RuntimeException {
+            public DownLoadException(String message) {
+                super(message);
+            }
+        }
+        File file = new File("I:\\storage\\"+ fileName);
+        if(!file.exists()){
+            throw new DownLoadException("下载文件不存在");
+        }
+        response.reset();
+        response.setContentType("application/octet-stream");
+        response.setCharacterEncoding("utf-8");
+        response.setContentLength((int) file.length());
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName );
+
+        try(BufferedInputStream bis = new BufferedInputStream(Files.newInputStream(file.toPath()));) {
+            byte[] buff = new byte[1024];
+            OutputStream os  = response.getOutputStream();
+            int i = 0;
+            while ((i = bis.read(buff)) != -1) {
+                os.write(buff, 0, i);
+                os.flush();
+            }
+        } catch (IOException e) {
+            throw new DownLoadException("下载文件不存在");
+        }
+        JSONObject result = new JSONObject();
+        result.put("code","200");
+        result.put("message", "下载文件成功");
+        return result.toString();
     }
 }
