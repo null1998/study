@@ -9,11 +9,13 @@ import org.example.dao.StudentDao;
 import org.example.entity.Region;
 import org.example.eventbus.MyEventBusListener;
 import org.example.service.DataBaseService;
+import org.example.service.parser.ParserFactory;
 import org.example.util.TimeUtil;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.spring.cache.CacheConfig;
+import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.CacheManager;
@@ -27,7 +29,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -85,6 +90,13 @@ public class Application {
             eventBus.register(eventBusListener);
         }
         return eventBus;
+    }
+
+    @Bean("parserFactory")
+    ServiceLocatorFactoryBean serviceLocatorFactoryBean() {
+        ServiceLocatorFactoryBean serviceLocatorFactoryBean = new ServiceLocatorFactoryBean();
+        serviceLocatorFactoryBean.setServiceLocatorInterface(ParserFactory.class);
+        return serviceLocatorFactoryBean;
     }
 
     @GetMapping("/limit/{id}")
