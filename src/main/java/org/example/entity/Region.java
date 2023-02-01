@@ -1,6 +1,15 @@
 package org.example.entity;
 
 public class Region {
+
+    public Region() {
+    }
+
+    public Region(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     private Integer id;
 
     private String name;
