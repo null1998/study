@@ -205,4 +205,9 @@ public class Application {
         result.put("message", "下载文件成功");
         return result.toString();
     }
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "hello " + LocalDateTime.now();
+    }
 }
