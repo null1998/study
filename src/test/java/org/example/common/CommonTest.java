@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author huang
@@ -33,6 +34,22 @@ public class CommonTest {
             Assertions.assertEquals("name", value.getName());
             Assertions.assertEquals("3", value.getBookItem().getItemList().get(0).getId());
             Assertions.assertEquals("c", value.getBookItem().getItemList().get(0).getName());
+        }
+    }
+
+    /**
+     * 测试abs(a)%100和abs(a%100)结果是否相同
+     * m%n=m-(m/n)*n
+     *
+     */
+    @Test
+    public void testNegativeMod() {
+        int limit = 10000000;
+        Random random = new Random(limit);
+        for (int i = 0; i < limit; i++) {
+            int a = random.nextInt();
+            Assertions.assertEquals(Math.abs(a) % 100, Math.abs(a % 100));
+            System.out.println(String.format("%s  %s  %s", a, Math.abs(a) % 100, Math.abs(a % 100)));
         }
     }
 }
