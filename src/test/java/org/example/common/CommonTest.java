@@ -1,6 +1,7 @@
 package org.example.common;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.collections4.ListUtils;
 import org.example.entity.Book;
 import org.example.entity.BookItem;
@@ -12,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * @author huang
@@ -51,5 +53,17 @@ public class CommonTest {
             Assertions.assertEquals(Math.abs(a) % 100, Math.abs(a % 100));
             System.out.println(String.format("%s  %s  %s", a, Math.abs(a) % 100, Math.abs(a % 100)));
         }
+    }
+
+    @Test
+    public void testSetsIntersection() {
+        Set<String> set1 = Sets.newHashSet("1");
+        Set<String> set2 = Sets.newHashSet("1", "2");
+        Sets.SetView<String> set3 = Sets.intersection(set1, set2);
+        Assertions.assertEquals(1, set3.size());
+        Assertions.assertTrue(set3.contains("1"));
+
+        set2.removeAll(set3);
+        Assertions.assertTrue(set3.isEmpty());
     }
 }

@@ -2,6 +2,8 @@ package org.example;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.eventbus.EventBus;
+import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.shardingsphere.shardingjdbc.spring.boot.SpringBootConfiguration;
 import org.example.config.DefaultAutoExpireCacheManager;
 import org.example.dao.RegionMapper;
@@ -97,6 +99,18 @@ public class Application {
         ServiceLocatorFactoryBean serviceLocatorFactoryBean = new ServiceLocatorFactoryBean();
         serviceLocatorFactoryBean.setServiceLocatorInterface(ParserFactory.class);
         return serviceLocatorFactoryBean;
+    }
+
+    @Bean("defaultMqProducer")
+    DefaultMQProducer defaultMqProducerBean() {
+        DefaultMQProducer producer = new DefaultMQProducer("defaultMqProducer");
+        producer.setNamesrvAddr("1.13.176.168");
+        try {
+            producer.start();
+        } catch (MQClientException e) {
+            throw new RuntimeException("rocketMq生产者启动失败", e);
+        }
+        return producer;
     }
 
     @GetMapping("/limit/{id}")
