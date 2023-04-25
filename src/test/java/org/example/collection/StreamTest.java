@@ -37,7 +37,10 @@ public class StreamTest {
         Assertions.assertEquals("beijing", regionMap.get(1));
         Assertions.assertEquals("fujian", regionMap.get(2));
 
-        ArrayList<Order> orderList = Lists.newArrayList(new Order("01", "1", "a", BigDecimal.valueOf(1)), new Order("01", "2", "b", BigDecimal.valueOf(2)), new Order("02", "3", "c", BigDecimal.valueOf(3)));
+        ArrayList<Order> orderList = Lists.newArrayList(
+                new Order("01", "1", "a", new BigDecimal("1")),
+                new Order("01", "2", "b", new BigDecimal("2")),
+                new Order("02", "3", "c", new BigDecimal("3")));
         // 想对数据进行分类，并且指定的key是可以重复的，应该使用groupingBy，toSet是可选参数
         Map<String, Set<Order>> orderMap = orderList.stream().collect(Collectors.groupingBy(Order::getOrderType, Collectors.toSet()));
         Assertions.assertEquals(2, orderMap.get("01").size());
@@ -55,7 +58,7 @@ public class StreamTest {
 
         // 对订单进行分组，并找出每组订单金额最大的那个
         Map<String, Optional<Order>> maxMap = orderList.stream().collect(Collectors.groupingBy(Order::getOrderType, Collectors.maxBy(Comparator.comparing(Order::getAmt))));
-        Assertions.assertEquals("2", maxMap.get("01").orElse(new Order()).getAmt().toString());
-        Assertions.assertEquals("3", maxMap.get("02").orElse(new Order()).getAmt().toString());
+        Assertions.assertEquals(new BigDecimal("2"), maxMap.get("01").orElse(new Order()).getAmt());
+        Assertions.assertEquals(new BigDecimal("3"), maxMap.get("02").orElse(new Order()).getAmt());
     }
 }

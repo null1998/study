@@ -19,6 +19,9 @@ import java.util.Set;
  * @author huang
  */
 public class CommonTest {
+    /**
+     * 测试BeanUtils.copyProperties浅拷贝对象导致的问题
+     */
     @Test
     public void testBeanUtilShallowClone() {
         List<Book> bookList = new ArrayList<>();
@@ -55,15 +58,21 @@ public class CommonTest {
         }
     }
 
+    /**
+     * 测试Sets.intersection返回的是动态视图导致的问题
+     */
     @Test
     public void testSetsIntersection() {
         Set<String> set1 = Sets.newHashSet("1");
         Set<String> set2 = Sets.newHashSet("1", "2");
+        // set3是set1和set2交集的视图
         Sets.SetView<String> set3 = Sets.intersection(set1, set2);
         Assertions.assertEquals(1, set3.size());
         Assertions.assertTrue(set3.contains("1"));
 
+        // set2{1，2}减去set3{1}={2}
         set2.removeAll(set3);
+        // set3=set1{1}和set2{2}的交集=空
         Assertions.assertTrue(set3.isEmpty());
     }
 }

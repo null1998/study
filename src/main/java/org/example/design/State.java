@@ -99,6 +99,11 @@ class Player {
      */
     private Boolean playing;
 
+    public Player() {
+        this.setState(new LockedState(this));
+        this.setPlaying(false);
+    }
+
     /**
      * 点击锁定键
      */
