@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.SensitiveWordMapper">
+    <resultMap id="SensitiveWordMap" type="org.example.entity.SensitiveWord">
+        <id column="fid" jdbcType="INTEGER" property="id"/>
+        <result column="ftype" jdbcType="VARCHAR" property="type"/>
+        <result column="fvalue" jdbcType="VARCHAR" property="value"/>
+    </resultMap>
+    <insert id="save">
+        insert into uaa_sensitive_word_test(fid,ftype,fvalue) values
+        <foreach collection="sensitiveWordList" item="item" separator=",">
+            (#{item.id},#{item.type},#{item.value})
+        </foreach>
+    </insert>
+    <delete id="delete">
+        delete from uaa_sensitive_word_test
+        <where>
+            <if test="idList != null and idList.size() > 0">
+                fid in
+                <foreach collection="idList" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+    <select id="query" resultMap="SensitiveWordMap">
+        select
+        fid,
+        ftype,
+        fvalue
+        from uaa_sensitive_word_test
+        where ftype = #{type}
+    </select>
+</mapper>
