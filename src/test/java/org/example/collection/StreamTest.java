@@ -24,6 +24,27 @@ public class StreamTest {
         Assertions.assertEquals(6, Lists.newArrayList(1, 2, 3).stream().reduce(Integer::sum).orElse(0));
         Assertions.assertEquals(3, Lists.newArrayList(1, 2, 3).stream().max(Integer::compare).orElse(0));
         Assertions.assertEquals(1, Lists.newArrayList(1, 2, 3).stream().min(Integer::compare).orElse(0));
+        ArrayList<Order> orderList = Lists.newArrayList(
+                new Order("01", "1", "a", new BigDecimal("1")),
+                new Order("01", "2", "b", new BigDecimal("2")),
+                new Order("02", "3", "c", new BigDecimal("4")));
+        // 提取字段求和
+        Assertions.assertEquals(new BigDecimal("7"), orderList.stream().map(Order::getAmt).reduce(BigDecimal.ZERO, BigDecimal::add));
+        // 分组求和
+        Map<String, BigDecimal> groupSumMap = orderList.stream()
+                .collect(Collectors.groupingBy(Order::getOrderType,
+                        Collectors.reducing(BigDecimal.ZERO, Order::getAmt, BigDecimal::add)));
+        Assertions.assertEquals(new BigDecimal("3"), groupSumMap.get("01"));
+        Assertions.assertEquals(new BigDecimal("4"), groupSumMap.get("02"));
+        // 多级分组
+        Map<String, Map<String, List<Order>>> multiLevelGroupMap = orderList.stream()
+                .collect(Collectors.groupingBy(Order::getOrderType, Collectors.groupingBy(Order::getOrderId)));
+        Assertions.assertEquals(2, multiLevelGroupMap.size());
+        Assertions.assertEquals(2, multiLevelGroupMap.get("01").size());
+        Assertions.assertEquals(1, multiLevelGroupMap.get("02").size());
+        Assertions.assertEquals("a", multiLevelGroupMap.get("01").get("1").get(0).getOrderName());
+        Assertions.assertEquals("b", multiLevelGroupMap.get("01").get("2").get(0).getOrderName());
+        Assertions.assertEquals("c", multiLevelGroupMap.get("02").get("3").get(0).getOrderName());
     }
 
     /**
