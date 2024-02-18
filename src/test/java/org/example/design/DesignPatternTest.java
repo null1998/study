@@ -1,27 +1,34 @@
 package org.example.design;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 六大设计原则
+ * 单一职责原则、开闭原则、依赖倒置原则、里氏替换原则、迪米特法则、接口隔离原则
  * 设计模式测试
  * 创建型、结构型、行为型
  */
 public class DesignPatternTest {
     /**
-     * TODO 单例模式
      * 一个单一的类，该类负责创建自己的对象，同时确保只有单个对象被创建，创建型
+     * spring中常用的@Component等注解都是单例，@Scope("pototype")是多例
      */
     @Test
     public void testSingleton() {
-
+        Assertions.assertNotNull(SingleTon.getInstance());
     }
 
     /**
      * 工厂模式
+     * AbstractFactoryBean的getObject()
      * 在创建对象时不会对客户端暴露创建逻辑，并且是通过使用一个共同的接口来指向新创建的对象，创建型
      */
     @Test
@@ -45,6 +52,7 @@ public class DesignPatternTest {
 
     /**
      * 建造者模式
+     * BeanDefinitionBuilder
      * 使用多个简单的对象一步一步构建成一个复杂的对象，创建型
      */
     @Test
@@ -54,10 +62,15 @@ public class DesignPatternTest {
         System.out.println(carDirector.constructCar(sportCarBuilder));
         SUVCarBuilder suvCarBuilder = new SUVCarBuilder();
         System.out.println(carDirector.constructCar(suvCarBuilder));
+        ComputerBuilder computerBuilder = new ComputerBuilder();
+        Computer computer = computerBuilder.buildMouse("mouse-1").buildDisplay("display-1").build();
+        Assertions.assertEquals(computer.getMouse(), "mouse-1");
+        Assertions.assertEquals(computer.getDisplay(), "display-1");
     }
 
     /**
      * 外观模式
+     * JdbcUtils
      * 隐藏系统的复杂性，并向客户端提供了一个客户端可以访问系统的接口，结构型
      */
     @Test
@@ -68,6 +81,8 @@ public class DesignPatternTest {
 
     /**
      * 适配器模式
+     * AdvisorAdapter类，aop使用advice（通知）来增强被代理类，每种advice都有不同类型的拦截器，通过适配器提供统一对外接口
+     * DispatcherServlet的doDispatch使用HandlerAdapter替代controller执行相应方法，避免在新增controller时，使用if...else
      * 作为两个不兼容的接口之间的桥梁，结构型
      */
     @Test
@@ -79,6 +94,7 @@ public class DesignPatternTest {
 
     /**
      * 桥接模式
+     * spring-jdbc JdbcTemplate通过DataSource来桥接不同类型的数据库连接api
      * 用于把抽象化与实现化解耦，使得二者可以独立变化，结构型
      */
     @Test
@@ -90,6 +106,7 @@ public class DesignPatternTest {
 
     /**
      * 组合模式
+     * spring-mvc解析参数接口HandlerMethodArgumentResolver其中一个实现类HandlerMethodArgumentResolverComposite
      * 依据树形结构来组合对象，用来表示部分以及整体层次，结构型
      */
     @Test
@@ -108,6 +125,8 @@ public class DesignPatternTest {
 
     /**
      * 装饰器模式
+     * 带有Decorator spring-mvc中的HttpHeadResponseDecorator
+     * BufferedInputStream相关
      * 允许向一个现有的对象添加新的功能，同时又不改变其结构，结构型
      */
     @Test
@@ -124,7 +143,8 @@ public class DesignPatternTest {
 
     /**
      * 享元模式
-     * 用于减少创建对象的数量，以减少内存占用和提高性能，结构型
+     * BeanFactory使用享元模式管理Bean对象的创建和销毁，实现对象复用
+     * 用于减少创建对象的数量，以减少内存占用和提高性能，结构型。例如秒杀活动，商品对象可以缓存起来，库存变化时，new一个库存对象到商品对象即可
      * -XX:+PrintGCDetails
      */
     @Test
@@ -141,6 +161,7 @@ public class DesignPatternTest {
 
     /**
      * 代理模式
+     * 目标对象实现了接口，默认使用jdk动态代理，否则使用cglib代理，spring可以自动在jdk和cglib间切换
      * 创建具有现有对象的对象，以便向外界提供功能接口，结构型
      */
     @Test
@@ -152,6 +173,7 @@ public class DesignPatternTest {
 
     /**
      * 责任链模式
+     * spring-web HandlerInterceptor的preHandler() postHandler()可以在controller之前和之后执行
      * 给予请求的类型，对请求的发送者和接收者进行解耦，每个接收者都包含对另一个接收者的引用。如果一个对象不能处理该请求，那么它会把相同的请求传给下一个接收者，依此类推，行为型
      */
     @Test
@@ -159,10 +181,14 @@ public class DesignPatternTest {
         Handler handler = new ConcreteHandlerA(new ConcreteHandlerB(null));
         handler.handle(new Request("A", "content a"));
         handler.handle(new Request("B", "content b"));
+        Handler h = new Handler.HandlerBuilder().addHandler(new ConcreteHandlerA()).addHandler(new ConcreteHandlerB()).build();
+        h.handle(new Request("A", "content aa"));
+        h.handle(new Request("B", "content bb"));
     }
 
     /**
      * 策略模式
+     * spring实例化对象策略InstantiationStrategy
      * 创建表示各种策略的对象和一个行为随着策略对象改变而改变的 context 对象。策略对象改变 context 对象的执行算法，行为型
      */
     @Test
@@ -176,6 +202,7 @@ public class DesignPatternTest {
 
     /**
      * 模板模式
+     * spring JdbcTemplate简洁的模板模式，没有抽象类和继承类，变化的部分，通过回调传给方法参数
      * 一个抽象类公开定义了执行它的方法的方式/模板。它的子类可以按需要重写方法实现，但调用将以抽象类中定义的方式进行，行为型
      */
     @Test
@@ -188,6 +215,7 @@ public class DesignPatternTest {
 
     /**
      * 命令模式
+     * spring JdbcTemplate回调参数可以看成是命令
      * 请求以命令的形式包裹在对象中，并传给调用对象。调用对象寻找可以处理该命令的合适的对象，并把该命令传给相应的对象，该对象执行命令，行为型
      */
     @Test
@@ -200,7 +228,8 @@ public class DesignPatternTest {
     }
 
     /**
-     * TODO 访问者模式
+     * 访问者模式
+     * druid 使用访问者模式解析sql语法树
      * 使用了一个访问者类，它改变了元素类的执行算法。通过这种方式，元素的执行算法可以随着访问者改变而改变，行为型
      */
     @Test
@@ -210,6 +239,9 @@ public class DesignPatternTest {
 
     /**
      * 观察者模式
+     * ApplicationContext容器对象
+     * ApplicationEvent事件对象
+     * ApplicationListener事件监听对象
      * 当一个对象被修改时，则会自动通知依赖它的对象，行为型
      */
     @Test
@@ -224,6 +256,7 @@ public class DesignPatternTest {
 
     /**
      * 状态模式
+     * spring state machine
      * 类的行为是基于它的状态改变的，行为型
      */
     @Test
@@ -259,16 +292,21 @@ public class DesignPatternTest {
     }
 
     /**
-     * TODO 解释器模式
+     * 解释器模式
+     * spring ExpressionParser
      * 提供了评估语言的语法或表达式的方式，实现了一个表达式接口，该接口解释一个特定的上下文。这种模式被用在 SQL 解析、符号处理引擎等，行为模式
      */
     @Test
     public void testInterpreter() {
-
+        ExpressionParser expressionParser = new SpelExpressionParser();
+        Expression expression = expressionParser.parseExpression("1*2+4*5-1");
+        Integer value = (Integer) expression.getValue();
+        Assertions.assertEquals(21, value);
     }
 
     /**
      * 迭代器模式
+     * jdk迭代器
      * 用于顺序访问集合对象的元素，不需要知道集合对象的底层表示，行为型
      */
     @Test
@@ -282,6 +320,7 @@ public class DesignPatternTest {
 
     /**
      * 中介者模式
+     * jdk Timer sched() 所有task放入Timer维护的队列，Timer就是中介者，task就是同事对象
      * 用来降低多个对象和类之间的通信复杂性。这种模式提供了一个中介类，该类通常处理不同类之间的通信，并支持松耦合，使代码易于维护，行为型
      */
     @Test
@@ -295,6 +334,7 @@ public class DesignPatternTest {
 
     /**
      * 备忘录模式
+     * spring StateManageableMessageContext的createMessagesMemento()
      * 保存一个对象的某个状态，以便在适当的时候恢复对象，行为型
      */
     @Test

@@ -3,14 +3,43 @@ package org.example.design;
 public abstract class Handler {
     protected Handler nextHandler;
 
+    public Handler() {
+    }
+
     public Handler(Handler nextHandler) {
         this.nextHandler = nextHandler;
     }
 
+    public Handler next(Handler nextHandler) {
+        this.nextHandler = nextHandler;
+        return this;
+    }
+
     abstract void handle(Request request);
+
+    public static class HandlerBuilder {
+        private Handler head;
+        private Handler tail;
+        public HandlerBuilder addHandler(Handler handler) {
+            if (head == null) {
+                 head = tail = handler;
+                 return this;
+            }
+            tail.next(handler);
+            tail = handler;
+            return this;
+        }
+
+        public Handler build() {
+            return head;
+        }
+    }
 }
 
 class ConcreteHandlerA extends Handler {
+
+    public ConcreteHandlerA() {
+    }
 
     public ConcreteHandlerA(Handler nextHandler) {
         super(nextHandler);
@@ -28,6 +57,9 @@ class ConcreteHandlerA extends Handler {
 }
 
 class ConcreteHandlerB extends Handler {
+
+    public ConcreteHandlerB() {
+    }
 
     public ConcreteHandlerB(Handler nextHandler) {
         super(nextHandler);
