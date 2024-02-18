@@ -1,6 +1,7 @@
 package org.example;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -55,6 +56,16 @@ public class Application {
     private StudentDao studentDao;
     @Resource
     private RegionMapper regionMapper;
+
+    @GetMapping("/test")
+    public Region test() {
+        return regionMapper.selectByPrimaryKey(1);
+    }
+
+    @GetMapping("/testList")
+    public List<Region> testList() {
+        return regionMapper.selectByIds(Lists.newArrayList(1,2,3));
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

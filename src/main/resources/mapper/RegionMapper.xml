@@ -27,4 +27,13 @@
         select id, name
         from region
     </select>
+    <select id="selectByIds" resultMap="BaseResultMap">
+        select id, name
+        from region
+        <where>
+            <foreach collection="idList" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </where>
+    </select>
 </mapper>
