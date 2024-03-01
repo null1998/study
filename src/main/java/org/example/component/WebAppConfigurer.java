@@ -24,7 +24,7 @@ public class WebAppConfigurer implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 加入顺序就是执行顺序
-        registry.addInterceptor(firstHandlerInterceptor).addPathPatterns("/**");
-        registry.addInterceptor(secondHandlerInterceptor).addPathPatterns("/**");
+//        registry.addInterceptor(firstHandlerInterceptor).addPathPatterns("/**");
+//        registry.addInterceptor(secondHandlerInterceptor).addPathPatterns("/**");
     }
 }
