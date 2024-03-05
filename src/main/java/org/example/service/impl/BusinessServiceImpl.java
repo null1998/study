@@ -103,4 +103,31 @@ public class BusinessServiceImpl implements IBusinessService {
             }
         }));
     }
+
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
+    public void businessMultiInsert(Integer startId, Integer number) {
+        for (int i = startId; i < startId + number; i++) {
+            Region region = new Region();
+            region.setId(i);
+            region.setName("id_" + i);
+            regionMapper.insert(region);
+        }
+    }
+
+    @Override
+    public void businessDelete(Integer id) {
+        regionMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
+    public void businessMultiDelete(Integer startId, Integer number) {
+        for (int i = startId; i < startId + number; i++) {
+            if (i % 2 == 0) {
+                continue;
+            }
+            regionMapper.deleteByPrimaryKey(i);
+        }
+    }
 }

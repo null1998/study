@@ -54,4 +54,19 @@ public class BusinessController {
     public void changeTableName(@RequestParam String busType, @RequestParam String tableName) {
         map.put(busType, tableName);
     }
+
+    @GetMapping("/businessMultiInsert")
+    public void businessMultiInsert(@RequestParam Integer startId, @RequestParam Integer number) {
+        businessService.businessMultiInsert(startId, number);
+    }
+
+    @GetMapping("/businessDelete")
+    public void businessDelete(@RequestParam Integer id) {
+        businessService.businessDelete(id);
+    }
+
+    @GetMapping("/businessMultiDelete")
+    public void businessMultiDelete(@RequestParam Integer startId, @RequestParam Integer number) {
+        businessService.businessMultiDelete(startId, number);
+    }
 }

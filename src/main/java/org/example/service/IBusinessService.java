@@ -37,4 +37,27 @@ public interface IBusinessService {
      * @param id 主键
      */
     void businessAsync(Integer id);
+
+    /**
+     * 批量插入
+     *
+     * @param startId 起始主键
+     * @param number  数量
+     */
+    void businessMultiInsert(Integer startId, Integer number);
+
+    /**
+     * 删除
+     *
+     * @param id 主键
+     */
+    void businessDelete(Integer id);
+
+    /**
+     * 批量删除
+     *
+     * @param startId 起始主键
+     * @param number  数量
+     */
+    void businessMultiDelete(Integer startId, Integer number);
 }
