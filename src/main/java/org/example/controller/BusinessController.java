@@ -69,4 +69,9 @@ public class BusinessController {
     public void businessMultiDelete(@RequestParam Integer startId, @RequestParam Integer number) {
         businessService.businessMultiDelete(startId, number);
     }
+
+    @GetMapping("/businessIncreaseNum")
+    public void businessIncreaseNum(@RequestParam Integer id) {
+        businessService.businessIncreaseNum(id);
+    }
 }

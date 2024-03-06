@@ -4,31 +4,41 @@
     <resultMap id="BaseResultMap" type="org.example.entity.Region">
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="num" jdbcType="INTEGER" property="num"/>
     </resultMap>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete from region
         where id = #{id,jdbcType=INTEGER}
     </delete>
     <insert id="insert" parameterType="org.example.entity.Region">
-        insert into region (id, name)
-        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR})
+        insert into region (id, name, num)
+        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{num,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertBatch">
+        insert into region (id, name, num)
+        values
+        <foreach collection="regionList" separator="," item="item">
+            (
+            #{item.id,jdbcType=INTEGER}, #{item.name,jdbcType=VARCHAR}, #{item.num,jdbcType=INTEGER}
+            )
+        </foreach>
     </insert>
     <update id="updateByPrimaryKey" parameterType="org.example.entity.Region">
         update region
-        set name = #{name,jdbcType=VARCHAR}
+        set name = #{name,jdbcType=VARCHAR}, num = #{num,jdbcType=INTEGER}
         where id = #{id,jdbcType=INTEGER}
     </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        select id, name
+        select id, name, num
         from region
         where id = #{id,jdbcType=INTEGER}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
-        select id, name
+        select id, name, num
         from region
     </select>
     <select id="selectByIds" resultMap="BaseResultMap">
-        select id, name
+        select id, name, num
         from region
         <where>
             id in
@@ -47,4 +57,9 @@
             </foreach>
         </where>
     </delete>
+    <update id="increaseNum" parameterType="java.lang.Integer">
+        update region
+        set num = num + 1
+        where id = #{id,jdbcType=INTEGER}
+    </update>
 </mapper>

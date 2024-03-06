@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import com.alibaba.ttl.TtlRunnable;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections4.ListUtils;
 import org.example.annotation.GetUsingTable;
 import org.example.dao.RegionMapper;
 import org.example.entity.Region;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -52,6 +54,7 @@ public class BusinessServiceImpl implements IBusinessService {
         Region region = new Region();
         region.setId(id);
         region.setName("id_" + id);
+        region.setNum(1);
         int insert = regionMapper.insert(region);
         if (insert != 1) {
             throw new RuntimeException("插入错误");
@@ -91,6 +94,7 @@ public class BusinessServiceImpl implements IBusinessService {
         Region region = new Region();
         region.setId(id);
         region.setName("id_" + id);
+        region.setNum(1);
         int insert = regionMapper.insert(region);
         if (insert != 1) {
             throw new RuntimeException("插入错误");
@@ -107,11 +111,16 @@ public class BusinessServiceImpl implements IBusinessService {
     @Override
     @Transactional(rollbackFor = Throwable.class)
     public void businessMultiInsert(Integer startId, Integer number) {
+        List<Region> regionList = new ArrayList<>();
         for (int i = startId; i < startId + number; i++) {
             Region region = new Region();
             region.setId(i);
             region.setName("id_" + i);
-            regionMapper.insert(region);
+            region.setNum(1);
+            regionList.add(region);
+        }
+        for (List<Region> partition : ListUtils.partition(regionList, 10000)) {
+            regionMapper.insertBatch(partition);
         }
     }
 
@@ -128,6 +137,14 @@ public class BusinessServiceImpl implements IBusinessService {
                 continue;
             }
             regionMapper.deleteByPrimaryKey(i);
+        }
+    }
+
+    @Override
+    public void businessIncreaseNum(Integer id) {
+        int update = regionMapper.increaseNum(id);
+        if (update != 1) {
+            throw new RuntimeException("更新错误");
         }
     }
 }

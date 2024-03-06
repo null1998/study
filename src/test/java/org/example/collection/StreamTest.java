@@ -52,7 +52,7 @@ public class StreamTest {
      */
     @Test
     public void testCollectors() {
-        List<Region> regionList = Lists.newArrayList(new Region(1, "beijing"), new Region(2, "fujian"));
+        List<Region> regionList = Lists.newArrayList(new Region(1, "beijing", 1), new Region(2, "fujian", 1));
         // 想让一个id对应一个region，应该使用toMap
         Map<Integer, String> regionMap = regionList.stream().collect(Collectors.toMap(Region::getId, Region::getName));
         Assertions.assertEquals("beijing", regionMap.get(1));

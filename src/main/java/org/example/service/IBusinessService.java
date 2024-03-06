@@ -60,4 +60,11 @@ public interface IBusinessService {
      * @param number  数量
      */
     void businessMultiDelete(Integer startId, Integer number);
+
+    /**
+     * 增长num值
+     *
+     * @param id 主键
+     */
+    void businessIncreaseNum(Integer id);
 }

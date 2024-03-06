@@ -14,6 +14,8 @@ public interface RegionMapper {
 
     int insert(Region record);
 
+    int insertBatch(@Param("regionList") List<Region> regionList);
+
     Region selectByPrimaryKey(Integer id);
 
     List<Region> selectAll();
@@ -23,4 +25,6 @@ public interface RegionMapper {
     List<Region> selectByIds(@Param("idList") List<Integer> idList);
 
     int deleteByIds(@Param("idList") List<Integer> idList);
+
+    int increaseNum(Integer id);
 }
