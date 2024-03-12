@@ -28,8 +28,8 @@ public class FragmentedSpaceMockTest {
         String businessMultiInsertUrl = "/businessMultiInsert";
         // 请求业务接口，批量插入记录
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(businessMultiInsertUrl)
-                .param("startId", String.valueOf(1000001))
-                .param("number", String.valueOf(4000000))
+                .param("startId", String.valueOf(1))
+                .param("number", String.valueOf(1000000))
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -41,7 +41,7 @@ public class FragmentedSpaceMockTest {
     void testLoopInsert() throws Exception {
         // 业务插入接口
         String businessInsertUrl = "/businessInsert";
-        for (int i = 600001; i <= 610000; i++) {
+        for (int i = 2000000; i <= 2000001; i++) {
             // 请求业务接口，插入一条记录
             MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(businessInsertUrl)
                     .param("id", String.valueOf(i))
@@ -59,8 +59,8 @@ public class FragmentedSpaceMockTest {
         String businessMultiDeleteUrl = "/businessMultiDelete";
         // 请求业务接口，批量插入记录
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(businessMultiDeleteUrl)
-                .param("startId", String.valueOf(500001))
-                .param("number", String.valueOf(100000))
+                .param("startId", String.valueOf(2000001))
+                .param("number", String.valueOf(10))
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -93,7 +93,7 @@ public class FragmentedSpaceMockTest {
         String businessIncreaseNumUrl = "/businessIncreaseNum";
         Random random = new Random();
         for (int i = 1; i <= 1000; i++) {
-            int randomId = random.nextInt(5000000) + 1;
+            int randomId = random.nextInt(1000000) + 1;
             // 请求业务接口，num+1
             MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(businessIncreaseNumUrl)
                     .param("id", String.valueOf(randomId))
@@ -102,6 +102,28 @@ public class FragmentedSpaceMockTest {
             MockHttpServletResponse response = mvcResult.getResponse();
             int status = response.getStatus();
             Assertions.assertEquals(200, status);
+        }
+    }
+
+    @Test
+    void testLoopIncreaseNumPlural() throws Exception {
+        // 业务num增长接口
+        String businessIncreaseNumUrl = "/businessIncreaseNum";
+        Random random = new Random();
+        int i = 1;
+        while (i <= 100000) {
+            int randomId = random.nextInt(1000000) + 1;
+            if (randomId % 2 == 0) {
+                // 请求业务接口，num+1
+                MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(businessIncreaseNumUrl)
+                        .param("id", String.valueOf(randomId))
+                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn();
+                MockHttpServletResponse response = mvcResult.getResponse();
+                int status = response.getStatus();
+                Assertions.assertEquals(200, status);
+                i++;
+            }
         }
     }
 }

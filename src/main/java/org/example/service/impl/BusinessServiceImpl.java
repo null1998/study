@@ -120,7 +120,8 @@ public class BusinessServiceImpl implements IBusinessService {
             regionList.add(region);
         }
         for (List<Region> partition : ListUtils.partition(regionList, 10000)) {
-            regionMapper.insertBatch(partition);
+//            regionMapper.insertBatch(partition);
+            regionMapper.insertBatchOracle(partition);
         }
     }
 

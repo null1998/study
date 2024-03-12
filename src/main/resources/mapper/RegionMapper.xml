@@ -23,6 +23,16 @@
             )
         </foreach>
     </insert>
+    <insert id="insertBatchOracle">
+        insert into region (id, name, num)
+        <foreach collection="regionList" item="item" separator="UNION ALL">
+            select
+            #{item.id},
+            #{item.name},
+            #{item.num}
+            from dual
+        </foreach>
+    </insert>
     <update id="updateByPrimaryKey" parameterType="org.example.entity.Region">
         update region
         set name = #{name,jdbcType=VARCHAR}, num = #{num,jdbcType=INTEGER}

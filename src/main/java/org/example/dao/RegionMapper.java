@@ -16,6 +16,8 @@ public interface RegionMapper {
 
     int insertBatch(@Param("regionList") List<Region> regionList);
 
+    int insertBatchOracle(@Param("regionList") List<Region> regionList);
+
     Region selectByPrimaryKey(Integer id);
 
     List<Region> selectAll();
