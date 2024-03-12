@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -120,8 +121,8 @@ public class BusinessServiceImpl implements IBusinessService {
             regionList.add(region);
         }
         for (List<Region> partition : ListUtils.partition(regionList, 10000)) {
-//            regionMapper.insertBatch(partition);
-            regionMapper.insertBatchOracle(partition);
+            regionMapper.insertBatch(partition);
+//            regionMapper.insertBatchOracle(partition);
         }
     }
 
@@ -143,9 +144,12 @@ public class BusinessServiceImpl implements IBusinessService {
 
     @Override
     public void businessIncreaseNum(Integer id) {
+        LocalDateTime time = LocalDateTime.now();
         int update = regionMapper.increaseNum(id);
         if (update != 1) {
             throw new RuntimeException("更新错误");
         }
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println(String.format("当前时间：%s，耗时%s毫秒", now, ChronoUnit.MILLIS.between(time, now)));
     }
 }

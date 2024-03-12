@@ -1,5 +1,6 @@
 package org.example.test;
 
+import org.example.dao.FragmentedSpaceMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,6 +23,9 @@ public class FragmentedSpaceMockTest {
     @Resource
     private MockMvc mvc;
 
+    @Resource
+    private FragmentedSpaceMapper fragmentedSpaceMapper;
+
     @Test
     void testMultiInsert() throws Exception {
         // 业务批量插入接口
@@ -29,7 +33,7 @@ public class FragmentedSpaceMockTest {
         // 请求业务接口，批量插入记录
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(businessMultiInsertUrl)
                 .param("startId", String.valueOf(1))
-                .param("number", String.valueOf(1000000))
+                .param("number", String.valueOf(5000000))
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -111,8 +115,8 @@ public class FragmentedSpaceMockTest {
         String businessIncreaseNumUrl = "/businessIncreaseNum";
         Random random = new Random();
         int i = 1;
-        while (i <= 100000) {
-            int randomId = random.nextInt(1000000) + 1;
+        while (i <= 1000) {
+            int randomId = random.nextInt(5000000) + 1;
             if (randomId % 2 == 0) {
                 // 请求业务接口，num+1
                 MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(businessIncreaseNumUrl)
@@ -125,5 +129,37 @@ public class FragmentedSpaceMockTest {
                 i++;
             }
         }
+    }
+
+    @Test
+    void testAlterTableEngine() {
+        fragmentedSpaceMapper.alterTableEngine("REGION");
+    }
+
+    @Test
+    void testShrink() {
+        fragmentedSpaceMapper.enableRowMovement("REGION");
+        fragmentedSpaceMapper.shrinkSpaceCascade("REGION");
+        fragmentedSpaceMapper.disableRowMovement("REGION");
+    }
+
+    @Test
+    void testEnableRowMovement() {
+        fragmentedSpaceMapper.enableRowMovement("REGION");
+    }
+
+    @Test
+    void testShrinkSpaceCascade() {
+        fragmentedSpaceMapper.shrinkSpaceCascade("REGION");
+    }
+
+    @Test
+    void testDisableRowMovement() {
+        fragmentedSpaceMapper.disableRowMovement("REGION");
+    }
+
+    @Test
+    void testVacuumFull() {
+        fragmentedSpaceMapper.vacuumFull("REGION");
     }
 }
