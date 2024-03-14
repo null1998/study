@@ -1,5 +1,7 @@
 package org.example.service;
 
+import org.example.entity.Region;
+
 /**
  * @author huang
  */
@@ -67,4 +69,12 @@ public interface IBusinessService {
      * @param id 主键
      */
     void businessIncreaseNum(Integer id);
+
+    /**
+     * 查询
+     *
+     * @param id 主键
+     * @return {@link Region}
+     */
+    Region businessQuery(Integer id);
 }

@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.entity.Region;
 import org.example.service.IBusinessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -73,5 +74,10 @@ public class BusinessController {
     @GetMapping("/businessIncreaseNum")
     public void businessIncreaseNum(@RequestParam Integer id) {
         businessService.businessIncreaseNum(id);
+    }
+
+    @GetMapping("/businessQuery")
+    public Region businessQuery(@RequestParam Integer id) {
+        return businessService.businessQuery(id);
     }
 }

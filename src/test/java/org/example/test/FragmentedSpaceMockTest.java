@@ -132,6 +132,28 @@ public class FragmentedSpaceMockTest {
     }
 
     @Test
+    void testLoopQueryPlural() throws Exception {
+        // 业务查询接口
+        String businessQueryUrl = "/businessQuery";
+        Random random = new Random();
+        int i = 1;
+        while (i <= 1000) {
+            int randomId = random.nextInt(5000000) + 1;
+            if (randomId % 2 == 0) {
+                // 请求业务查询接口
+                MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(businessQueryUrl)
+                        .param("id", String.valueOf(randomId))
+                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn();
+                MockHttpServletResponse response = mvcResult.getResponse();
+                int status = response.getStatus();
+                Assertions.assertEquals(200, status);
+                i++;
+            }
+        }
+    }
+
+    @Test
     void testAlterTableEngine() {
         fragmentedSpaceMapper.alterTableEngine("REGION");
     }

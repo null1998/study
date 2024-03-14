@@ -152,4 +152,16 @@ public class BusinessServiceImpl implements IBusinessService {
         LocalDateTime now = LocalDateTime.now();
         System.out.println(String.format("当前时间：%s，耗时%s毫秒", now, ChronoUnit.MILLIS.between(time, now)));
     }
+
+    @Override
+    public Region businessQuery(Integer id) {
+        LocalDateTime time = LocalDateTime.now();
+        Region region = regionMapper.selectByPrimaryKey(id);
+        if (region == null) {
+            throw new RuntimeException("查询错误：没有值");
+        }
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println(String.format("当前时间：%s，耗时%s毫秒", now, ChronoUnit.MILLIS.between(time, now)));
+        return region;
+    }
 }
