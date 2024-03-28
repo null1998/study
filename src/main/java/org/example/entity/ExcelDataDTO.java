@@ -1,7 +1,6 @@
 package org.example.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,7 +10,6 @@ import java.time.LocalDate;
  */
 public class ExcelDataDTO {
     @ExcelProperty(value = "名字", index = 0)
-    @ColumnWidth(value = 20)
     private String name;
     @ExcelProperty(value = "金额", index = 1)
     private BigDecimal amt;
