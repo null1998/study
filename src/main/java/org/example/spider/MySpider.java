@@ -4,6 +4,7 @@ import org.example.common.SpiderConfig;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.handler.CompositePageProcessor;
+import us.codecraft.webmagic.scheduler.FileCacheQueueScheduler;
 
 /**
  * @author huang
@@ -21,6 +22,7 @@ public class MySpider {
         CompositePageProcessor compositePageProcessor = new CompositePageProcessor(Site.me().setUserAgent(SpiderConfig.USER_AGENT));
         compositePageProcessor.addSubPageProcessor(new ListPageProcessor());
         compositePageProcessor.addSubPageProcessor(new DetailPageProcessor());
-        Spider.create(compositePageProcessor).addUrl("https://www.baidu.com/").run();
+        FileCacheQueueScheduler fileCacheQueueScheduler = new FileCacheQueueScheduler("C:\\Users\\asus\\Desktop\\test\\url_cache_file");
+        Spider.create(compositePageProcessor).setScheduler(fileCacheQueueScheduler).addUrl("https://www.baidu.com/").run();
     }
 }

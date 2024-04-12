@@ -163,6 +163,11 @@
             <artifactId>webmagic-extension</artifactId>
             <version>0.10.0</version>
         </dependency>
+        <dependency>
+            <groupId>net.sourceforge.tess4j</groupId>
+            <artifactId>tess4j</artifactId>
+            <version>5.10.0</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
